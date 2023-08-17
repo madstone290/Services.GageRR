@@ -101,8 +101,6 @@
 
             Output output = new()
             {
-                Input = input,
-
                 AppraiserTrialAvg = appraiserTrialAvg,
                 AppraiserPartAvg = appraiserPartAvg,
                 AppraiserPartRange = appraiserPartRange,
@@ -119,17 +117,17 @@
                 PV_SD = pv,
                 TV_SD = tv,
 
-                EV_SV = 100 * ev / tv,
-                AV_SV = 100 * av / tv,
-                GRR_SV = 100 * grr / tv,
-                PV_SV = 100 * pv / tv,
+                EV_SV = tv == 0 ? null : 100 * ev / tv,
+                AV_SV = tv == 0 ? null : 100 * av / tv,
+                GRR_SV = tv == 0 ? null : 100 * grr / tv,
+                PV_SV = tv == 0 ? null : 100 * pv / tv,
 
-                EV_T = 100 * ev / input.Tolerance,
-                AV_T = 100 * av / input.Tolerance,
-                GRR_T = 100 * grr / input.Tolerance,
-                PV_T = 100 * pv / input.Tolerance,
+                EV_T = input.Tolerance == 0 ? null : 100 * ev / input.Tolerance,
+                AV_T = input.Tolerance == 0 ? null : 100 * av / input.Tolerance,
+                GRR_T = input.Tolerance == 0 ? null : 100 * grr / input.Tolerance,
+                PV_T = input.Tolerance == 0 ? null : 100 * pv / input.Tolerance,
 
-                NDC = NDC_CONSTANT * pv / grr
+                NDC = grr == 0 ? null : NDC_CONSTANT * pv / grr
             };
 
             return output;

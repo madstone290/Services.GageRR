@@ -53,17 +53,17 @@ namespace Services.GageRR.Tests
             Assert.Equal(0.031M, output.PV_SD, 3);
             Assert.Equal(0.031M, output.TV_SD, 3);
 
-            Assert.Equal(6.63M, output.EV_SV, 2);
-            Assert.Equal(2.67M, output.AV_SV, 2);
-            Assert.Equal(7.15M, output.GRR_SV, 2);
-            Assert.Equal(99.74M, output.PV_SV, 2);
+            Assert.Equal(6.63M, output.EV_SV.Value, 2);
+            Assert.Equal(2.67M, output.AV_SV.Value, 2);
+            Assert.Equal(7.15M, output.GRR_SV.Value, 2);
+            Assert.Equal(99.74M, output.PV_SV.Value, 2);
 
-            Assert.Equal(1.02M, output.EV_T, 2);
-            Assert.Equal(0.41M, output.AV_T, 2);
-            Assert.Equal(1.10M, output.GRR_T, 2);
-            Assert.Equal(15.30M, output.PV_T, 2);
+            Assert.Equal(1.02M, output.EV_T.Value, 2);
+            Assert.Equal(0.41M, output.AV_T.Value, 2);
+            Assert.Equal(1.10M, output.GRR_T.Value, 2);
+            Assert.Equal(15.30M, output.PV_T.Value, 2);
 
-            Assert.Equal(19.680M, output.NDC, 3);
+            Assert.Equal(19.680M, output.NDC.Value, 3);
         }
 
         [Fact]
@@ -109,20 +109,20 @@ namespace Services.GageRR.Tests
 
             Output output = new GageService().Calculate(input);
 
-            Assert.Equal(0.217M, output.EV_SD, 3);
+            Assert.Equal(0.217M, output.EV_SD, 3); 
             Assert.Equal(0.235M, output.AV_SD, 3);
             Assert.Equal(0.320M, output.GRR_SD, 3);
             Assert.Equal(0.872M, output.PV_SD, 3);
             Assert.Equal(0.929M, output.TV_SD, 3);
 
-            Assert.Equal(23.4M, output.EV_SV, 1);
-            Assert.Equal(25.3M, output.AV_SV, 1);
-            Assert.Equal(34.5M, output.GRR_SV, 1);
-            Assert.Equal(93.9M, output.PV_SV, 1);
+            Assert.Equal(23.4M, output.EV_SV.Value, 1);   
+            Assert.Equal(25.3M, output.AV_SV.Value, 1);
+            Assert.Equal(34.5M, output.GRR_SV.Value, 1);
+            Assert.Equal(93.9M, output.PV_SV.Value, 1);
 
             // Tolerance data is not provided
 
-            Assert.Equal(3.8M, output.NDC, 1);
+            Assert.Equal(3.8M, output.NDC.Value, 1);
         }
     }
 }
