@@ -129,6 +129,7 @@
 
                 NDC = grr == 0 ? null : NDC_CONSTANT * pv / grr
             };
+            output.Round();
 
             return output;
         }
