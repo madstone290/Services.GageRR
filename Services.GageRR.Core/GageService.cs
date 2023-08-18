@@ -155,6 +155,8 @@ namespace Services.GageRR.Core
                 AppraiserPartRangeAvg = appraiserPartRangeAvg,
                 AppraiserAvg = appraiserAvg,
                 PartAvg = partAvg,
+                PartAvgAvg = partAvg.Values.Average(),
+
                 Rp = rp,
                 R__ = r__,
                 X_Diff = x_diff,
