@@ -1,9 +1,9 @@
-﻿namespace Services.GageRR.Core
+﻿namespace Services.GageRR.Core.Data
 {
     /// <summary>
-    /// Gage R&R 계산 결과
+    /// Gage R&R (Average & Range method) 계산 결과
     /// </summary>
-    public class Output
+    public class AverageRangeOutput
     {
         /// <summary>
         /// 평가자/시행횟수 기준 평균 ex) 측정자1번, 시행1번에 대한 총 파트의 평균
@@ -29,7 +29,7 @@
         /// 평가자별 파트별 범위의 평균(R_)
         /// </summary>
         public Dictionary<int, decimal> AppraiserPartRangeAvg { get; set; } = new();
-        
+
         /// <summary>
         /// 파트별 평균 ex) 1번파트의 모든평가자/모든시행에 대한 평균
         /// </summary>

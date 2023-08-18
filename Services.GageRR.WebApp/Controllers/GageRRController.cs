@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.GageRR.Core;
+using Services.GageRR.Core.Data;
 
 namespace Services.GageRR.WebApp.Controllers
 {
@@ -11,9 +12,9 @@ namespace Services.GageRR.WebApp.Controllers
 
         [HttpPost]
         [Route("Calculate")]
-        public IActionResult Calcuate([FromBody] Input input)
+        public IActionResult Calcuate([FromBody] AverageRangeInput input)
         {
-            var output = _gageService.Calculate(input);
+            var output = _gageService.AverageRangeMethod(input);
             return Ok(output);
         }
     }

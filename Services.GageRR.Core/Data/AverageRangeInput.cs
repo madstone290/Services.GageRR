@@ -1,9 +1,9 @@
-﻿namespace Services.GageRR.Core
+﻿namespace Services.GageRR.Core.Data
 {
     /// <summary>
-    /// Gage R&R 계산 입력값
+    /// Gage R&R (Average & Range method) 계산 입력값
     /// </summary>
-    public class Input
+    public class AverageRangeInput
     {
         /// <summary>
         /// 측정값
@@ -45,12 +45,12 @@
         /// 총 파트수 [2,10]
         /// </summary>
         public int PartCount { get; set; }
-        
+
         /// <summary>
         /// 측정단위
         /// </summary>
         public Unit Unit { get; set; }
-        
+
         /// <summary>
         /// 규격상한
         /// </summary>
@@ -60,7 +60,7 @@
         /// 규격하한
         /// </summary>
         public decimal SpecLower { get; set; }
-        
+
         /// <summary>
         /// 공차
         /// </summary>
@@ -72,6 +72,6 @@
         public List<Record> Records { get; set; } = new();
     }
 
-  
+
 }
 

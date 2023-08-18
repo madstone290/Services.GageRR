@@ -1,4 +1,6 @@
-﻿namespace Services.GageRR.Core
+﻿using Services.GageRR.Core.Data;
+
+namespace Services.GageRR.Core
 {
     /// <summary>
     /// 여러 형태의 입력을 받아서 Input.Record 리스트로 변환한다.
@@ -10,7 +12,7 @@
         /// </summary>
         /// <param name="listData"></param>
         /// <returns></returns>
-        public static List<Input.Record> Build(List<List<List<double>>> listData)
+        public static List<AverageRangeInput.Record> Build(List<List<List<double>>> listData)
         {
             return listData.SelectMany((trials, appraiserIdx) =>
             {
@@ -18,7 +20,7 @@
                 {
                     return parts.Select((value, partIdx) =>
                     {
-                        return new Input.Record()
+                        return new AverageRangeInput.Record()
                         {
                             Appraiser = appraiserIdx + 1,
                             Trial = trialIdx + 1,

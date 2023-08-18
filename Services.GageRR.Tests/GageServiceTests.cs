@@ -1,4 +1,5 @@
 using Services.GageRR.Core;
+using Services.GageRR.Core.Data;
 
 namespace Services.GageRR.Tests
 {
@@ -34,7 +35,7 @@ namespace Services.GageRR.Tests
             };
 
 
-            var input = new Input()
+            var input = new AverageRangeInput()
             {
                 AppraiserCount = 3,
                 TrialCount = 3,
@@ -45,7 +46,7 @@ namespace Services.GageRR.Tests
                 Records = InputRecordFactory.Build(testData)
             };
 
-            Output output = new GageService().Calculate(input);
+            AverageRangeOutput output = new GageService().AverageRangeMethod(input);
 
             Assert.Equal(0.002M, output.EV_SD, 3);
             Assert.Equal(0.001M, output.AV_SD, 3);
@@ -96,7 +97,7 @@ namespace Services.GageRR.Tests
             };
 
 
-            var input = new Input()
+            var input = new AverageRangeInput()
             {
                 AppraiserCount = 3,
                 TrialCount = 3,
@@ -107,7 +108,7 @@ namespace Services.GageRR.Tests
                 Records = InputRecordFactory.Build(testData)
             };
 
-            Output output = new GageService().Calculate(input);
+            AverageRangeOutput output = new GageService().AverageRangeMethod(input);
 
             Assert.Equal(0.217M, output.EV_SD, 3); 
             Assert.Equal(0.235M, output.AV_SD, 3);

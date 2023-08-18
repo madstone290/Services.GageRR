@@ -1,11 +1,13 @@
-﻿namespace Services.GageRR.Core
+﻿using Services.GageRR.Core.Data;
+
+namespace Services.GageRR.Core
 {
     /// <summary>
     /// Gage R&R 입력값을 검증한다.
     /// </summary>
     public class InputValidator
     {
-        public void Validate(Input input)
+        public void Validate(AverageRangeInput input)
         {
             if (input == null)
                 throw new GageException("입력값이 없습니다.");

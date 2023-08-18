@@ -1,4 +1,6 @@
-﻿namespace Services.GageRR.Core
+﻿using Services.GageRR.Core.Data;
+
+namespace Services.GageRR.Core
 {
     /// <summary>
     /// Gage R&R 계산기
@@ -20,7 +22,12 @@
 
         private readonly InputValidator _inputValidator = new InputValidator();
 
-        public Output Calculate(Input input)
+        /// <summary>
+        /// 평균 및 범위법(Xbar-R) 계산. 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public AverageRangeOutput AverageRangeMethod(AverageRangeInput input)
         {
             _inputValidator.Validate(input);
 
@@ -99,7 +106,7 @@
 
             var tv = (grr.P(2) + pv.P(2)).Sqrt();
 
-            Output output = new()
+            AverageRangeOutput output = new()
             {
                 AppraiserTrialAvg = appraiserTrialAvg,
                 AppraiserPartAvg = appraiserPartAvg,
