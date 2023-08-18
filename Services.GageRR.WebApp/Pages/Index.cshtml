@@ -68,11 +68,21 @@
         justify-content: center;
     }
 
+    .PartAvgGrid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+        grid-template-rows: repeat(1, var(--cell-height));
+        background-color: antiquewhite;
+        align-items: center;
+        justify-content: center;
+    }
+
     .ResultGrid {
         display: grid;
         width: 100%;
         grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
-        grid-template-rows: repeat(4, var(--cell-height));
+        grid-template-rows: repeat(3, var(--cell-height));
         background-color: lightblue;
         align-items: center;
         justify-content: center;
@@ -251,58 +261,59 @@
     </div>
 }
 
-@* 결과 *@
 
-<div class="ResultGrid">
-    <div class="GridItem" style="grid-column:1/3; grid-row: 1;">
+@* 파트 평균 *@
+<div class="PartAvgGrid">
+    <div class="GridItem" style="grid-row: 1; grid-column:1/3;">
         <div class="CenterContainer">
             <span>파트평균</span>
-        </div>
-    </div>
-    <div class="GridItem" style="grid-column:1/3; grid-row: 2;">
-        <div class="CenterContainer">
-            <span>Rp</span>
-        </div>
-    </div>
-
-    <div class="GridItem" style="grid-column:1/3; grid-row: 3;">
-        <div class="CenterContainer">
-            <span>R__</span>
-        </div>
-    </div>
-
-    <div class="GridItem" style="grid-column:1/3; grid-row: 4;">
-        <div class="CenterContainer">
-            <span>X_Diff</span>
         </div>
     </div>
 
     @for (int part = 1; part <= Model.Part; part++)
     {
-        <div class="GridItem" style="grid-column:@(part + 2); grid-row: 1;">
+        <div class="GridItem" style="grid-row: 1; grid-column:@(part + 2);">
             <input id="@(GetPartAvgId(part))" value="" readonly />
         </div>
     }
-    <div class="GridItem" style="grid-column:3/@(Model.Part + 3); grid-row: 2/5;">
-        @*빈공간*@
-    </div>
-
-    <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 1;">
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
         <input id="resultAvg" readonly />
     </div>
-    <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 2;">
-        <input id="output-rp" readonly />
-    </div>
-    <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 3;">
-        <input id="output-r__" readonly />
-    </div>
-    <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 4;">
-        <input id="output-x_diff" readonly />
-    </div>
-
 </div>
 
+@* 결과1 *@
+<div class="ResultGrid">
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
+        <div class="CenterContainer">
+            <span>Rp</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 2)">
+        <div class="CenterContainer">
+            <span>R__</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 2);">
+        <div class="CenterContainer">
+            <span>X_Diff</span>
+        </div>
+    </div>
+
+ 
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
+        <input id="output-rp" readonly />
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 3);">
+        <input id="output-r__" readonly />
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 3);">
+        <input id="output-x_diff" readonly />
+    </div>
+</div>
+
+@* 결과2 *@
 <div class="ResultGrid2">
+    @* 표준편차 *@
     <div class="GridItem" style="grid-row: 1; grid-column:1;">
         <div class="CenterContainer">
             <span>EV</span>
