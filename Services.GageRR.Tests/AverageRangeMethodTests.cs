@@ -3,10 +3,10 @@ using Services.GageRR.Core.Data;
 
 namespace Services.GageRR.Tests
 {
-    public class GageServiceTests
+    public class AverageRangeMethodTests
     {
         [Fact]
-        public void MM_Appraiser3_Trial3_Part10()
+        public void Case1()
         {
             var testData = new List<List<List<double>>>()
             {
@@ -68,7 +68,7 @@ namespace Services.GageRR.Tests
         }
 
         [Fact]
-        public void Inch_Appraiser3_Trial3_Part5()
+        public void Case2()
         {
             var testData = new List<List<List<double>>>()
             {

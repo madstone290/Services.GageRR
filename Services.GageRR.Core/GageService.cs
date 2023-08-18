@@ -18,9 +18,50 @@ namespace Services.GageRR.Core
          * TV = Sqrt( GRR^2 + PV^2 )
          * */
 
+        /// <summary>
+        /// AverageRange method 계산 상수
+        /// </summary>
         private const decimal NDC_CONSTANT = 1.41m;
 
+        /// <summary>
+        /// Range method 계산 상수
+        /// </summary>
+        private const decimal RANGE_CONSTANT = 5.15m;
+
+        /// <summary>
+        /// Range method 계산 상수
+        /// </summary>
+        private const decimal RANGE_D2_CONSTANT = 1.19m;
+
         private readonly InputValidator _inputValidator = new InputValidator();
+
+
+        /// <summary>
+        /// 범위법 계산.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public RangeOutput RangeMethod(RangeInput input)
+        {
+            var partRange = input.Records.GroupBy(x => x.Part)
+                .ToDictionary(
+                    partGroup => partGroup.Key,
+                    partGroup => partGroup.Max(x => x.Value) - partGroup.Min(x => x.Value));
+
+            var r_ = partRange.Values.Average();
+            var grr = r_.M(RANGE_CONSTANT).D(RANGE_D2_CONSTANT);
+            var grr_t = grr.M(100).D(input.Tolerance);
+
+            RangeOutput output = new ()
+            {
+                PartRange = partRange,
+                R_ = r_,
+                GRR = grr,
+                GRR_T = grr_t
+            };
+            output.Round();
+            return output;
+        }
 
         /// <summary>
         /// 평균 및 범위법(Xbar-R) 계산. 
@@ -67,7 +108,7 @@ namespace Services.GageRR.Core
                     );
 
             // 평가자별 파트별 범위의 평균(R_)
-            var appraiserPartRangeAvg = appraiserPartRange.GroupBy(x=> x.Key)
+            var appraiserPartRangeAvg = appraiserPartRange.GroupBy(x => x.Key)
                 .ToDictionary(
                     appraiserGroup => appraiserGroup.Key,
                     appraiserGroup => appraiserGroup.Average(x => x.Value.Values.Average())
