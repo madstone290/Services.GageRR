@@ -11,6 +11,14 @@ namespace Services.GageRR.WebApp.Controllers
         private readonly GageService _gageService = new GageService();
 
         [HttpPost]
+        [Route("Range")]
+        public IActionResult Calcuate([FromBody] RangeInput input)
+        {
+            var output = _gageService.RangeMethod(input);
+            return Ok(output);
+        }
+
+        [HttpPost]
         [Route("AverageRange")]
         public IActionResult Calcuate([FromBody] AverageRangeInput input)
         {

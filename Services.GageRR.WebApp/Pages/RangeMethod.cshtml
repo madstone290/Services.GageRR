@@ -22,7 +22,7 @@
     {
         return $"range-avg";
     }
-    
+
 }
 
 
@@ -83,7 +83,6 @@
         width: 100%;
         grid-template-columns: 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
         grid-template-rows: repeat(3, var(--cell-height));
-
         align-items: center;
         justify-content: center;
     }
@@ -221,7 +220,7 @@
         <input id="@(GetRangeAvgId())" readonly />
     </div>
 </div>
-      
+
 
 
 @* 결과1 *@
@@ -249,53 +248,39 @@
 
 
     <div class="GridItem" style="grid-row: 1; grid-column:2;">
-        <input id="output-rp" readonly />
+        <input id="output-r_" readonly />
     </div>
     <div class="GridItem" style="grid-row: 2; grid-column:2;">
-        <input id="output-r__" readonly />
+        <input id="output-t" readonly />
     </div>
     <div class="GridItem" style="grid-row: 3; grid-column:2;">
-        <input id="output-x_diff" readonly />
+        <input id="output-grr" readonly />
     </div>
     <div class="GridItem" style="grid-row: 4; grid-column:2;">
-        <input id="output-x_diff" readonly />
+        <input id="output-grr_t" readonly />
     </div>
 </div>
 
 <script>
-
-
-
     const totalAppraiser = @(Model.Appraiser);
     const totalPart = @(Model.Part);
-
 
     function GetInputId(appraiser, part) {
         return `input-${appraiser}-${part}`;
     }
-    function GetAppraiserPartAvgId(appraiser, part) {
-        return `app-part-avg-${appraiser}-${part}`;
+
+    function GetInputAvgId(appraiser) {
+        return `input-avg-${appraiser}`;
     }
 
-    function GetAppraiserPartRangeId(appraiser, part) {
-        return `app-part-range-${appraiser}-${part}`;
+    function GetRangeId(part) {
+        return `range-${part}`;
     }
 
-    function GetAppraiserTrialAvgId(appraiser, trial) {
-        return `app-trial-avg-${appraiser}-${trial}`;
+    function GetRangeAvgId() {
+        return "range-avg";
     }
 
-    function GetAppraiserPartAvgAvgId(appraiser) {
-        return `app-part-avg-avg-${appraiser}`;
-    }
-
-    function GetAppraiserPartRangeAvgId(appraiser) {
-        return `app-part-range-avg-${appraiser}`;
-    }
-
-    function GetPartAvgId(part) {
-        return `part-avg-${part}`;
-    }
 
     function findInput(appraiser, part) {
         const id = GetInputId(appraiser, part);
@@ -311,7 +296,7 @@
     function handlePaste(e) {
         e.preventDefault();
 
-        const startAppraiser = e.target.attributes.appraiser.value;
+        const startAppraiser = parseInt(e.target.attributes.appraiser.value);
         const startPart = parseInt(e.target.attributes.part.value);
 
         let data = e.clipboardData.getData('text');
@@ -320,20 +305,12 @@
         let values = data.split('\r\n');
         values = values.map(x => x.split('\t'));
 
-        const totalTrials = values.length;
-        const totalParts = values.reduce((accumulator, currentValue) => Math.max(accumulator, currentValue.length), 0);
+        const inputAppraiserCount = values.length;
+        const inputPartCount = values.reduce((accumulator, currentValue) => Math.max(accumulator, currentValue.length), 0);
 
-        for (let part = 0; part < totalParts; part++) {
-            setText(startAppraiser, startPart + part, values[trial][part]);
-        }
-    }
-
-    function printValues() {
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                for (let part = 1; part <= totalPart; part++) {
-                    const input = findInput(appraiser, trial, part);
-                }
+        for (let appraiser = 0; appraiser < inputAppraiserCount; appraiser++) {
+            for (let part = 0; part < inputPartCount; part++) {
+                setText(startAppraiser + appraiser, startPart + part, values[appraiser][part]);
             }
         }
     }
@@ -342,7 +319,6 @@
         const input = {};
 
         input.AppraiserCount = totalAppraiser;
-        input.TrialCount = totalTrial;
         input.PartCount = totalPart;
         input.SpecLower = parseFloat(document.getElementById("sl").value);
         input.SpecUpper = parseFloat(document.getElementById("su").value);
@@ -351,20 +327,17 @@
         input.Records = [];
 
         for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                for (let part = 1; part <= totalPart; part++) {
-                    const inputelement = findInput(appraiser, trial, part);
-                    input.Records.push({
-                        Appraiser: appraiser,
-                        Trial: trial,
-                        Part: part,
-                        Value: inputelement.value ? parseFloat(inputelement.value) : 0
-                    });
-                }
+            for (let part = 1; part <= totalPart; part++) {
+                const inputelement = findInput(appraiser, part);
+                input.Records.push({
+                    Appraiser: appraiser,
+                    Part: part,
+                    Value: inputelement.value ? parseFloat(inputelement.value) : 0
+                });
             }
         }
 
-        const response = await fetch("/api/GageRR/Calculate", {
+        const response = await fetch("/api/GageRR/Range", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -374,59 +347,19 @@
 
         const json = await response.json();
 
-        document.getElementById("output-rp").value = json.Rp;
-
-        document.getElementById("output-r__").value = json.R__;
-        document.getElementById("output-x_diff").value = json.X_Diff;
-
-        document.getElementById("output-ev_sd").value = json.EV_SD;
-        document.getElementById("output-av_sd").value = json.AV_SD;
-        document.getElementById("grr_sd").value = json.GRR_SD;
-        document.getElementById("output-pv_sd").value = json.PV_SD;
-        document.getElementById("output-tv_sd").value = json.TV_SD;
-        document.getElementById("output-ndc").value = json.NDC;
-
-
-        document.getElementById("output-ev_sv").value = json.EV_SV;
-        document.getElementById("output-av_sv").value = json.AV_SV;
-        document.getElementById("output-grr_sv").value = json.GRR_SV;
-        document.getElementById("output-pv_sv").value = json.PV_SV;
-
-
-        document.getElementById("output-ev_t").value = json.EV_T;
-        document.getElementById("output-av_t").value = json.AV_T;
+       
+        document.getElementById("output-r_").value = json.R_;
+        document.getElementById("output-t").value = (input.SpecUpper - input.SpecLower).toFixed(2);
+        document.getElementById("output-grr").value = json.GRR;
         document.getElementById("output-grr_t").value = json.GRR_T;
-        document.getElementById("output-pv_t").value = json.PV_T;
-
-
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let part = 1; part <= totalPart; part++) {
-                const avgEdit = document.getElementById(GetAppraiserPartAvgId(appraiser, part));
-                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
-
-                const rangeEdit = document.getElementById(GetAppraiserPartRangeId(appraiser, part));
-                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
-            }
-
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                const trialEdit = document.getElementById(GetAppraiserTrialAvgId(appraiser, trial));
-                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
-            }
-
-            const avgAvgEdit = document.getElementById(GetAppraiserPartAvgAvgId(appraiser));
-            avgAvgEdit.value = json.AppraiserAvg[appraiser];
-
-            const rangeAvgEdit = document.getElementById(GetAppraiserPartRangeAvgId(appraiser));
-            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
-        }
-
+        
         for (let part = 1; part <= totalPart; part++) {
-            const partAvgEdit = document.getElementById(GetPartAvgId(part));
-            partAvgEdit.value = json.PartAvg[part];
+            const rangeEdit = document.getElementById(GetRangeId(part));
+            rangeEdit.value = json.PartRange[part];
         }
 
-        const partAvgAvgEdit = document.getElementById('resultAvg');
-        partAvgAvgEdit.value = json.PartAvgAvg;
+        const rangeAvgEdit = document.getElementById(GetRangeAvgId());
+        rangeAvgEdit.value = json.R_;
 
     }
 
