@@ -1,0 +1,677 @@
+﻿@page
+@model AverageRangeMethodModel
+@{
+    ViewData["Title"] = "Gage R&R";
+
+    string GetInputId(int appraiser, int trial, int part)
+    {
+        return $"input-{appraiser}-{trial}-{part}";
+    }
+
+    string GetAppraiserPartAvgId(int appraiser, int part)
+    {
+        return $"app-part-avg-{appraiser}-{part}";
+    }
+
+    string GetAppraiserPartRangeId(int appraiser, int part)
+    {
+        return $"app-part-range-{appraiser}-{part}";
+    }
+
+    string GetAppraiserTrialAvgId(int appraiser, int trial)
+    {
+        return $"app-trial-avg-{appraiser}-{trial}";
+    }
+
+    string GetAppraiserPartAvgAvgId(int appraiser)
+    {
+        return $"app-part-avg-avg-{appraiser}";
+    }
+
+    string GetAppraiserPartRangeAvgId(int appraiser)
+    {
+        return $"app-part-range-avg-{appraiser}";
+    }
+
+    string GetPartAvgId(int part)
+    {
+        return $"part-avg-{part}";
+    }
+}
+
+
+<style>
+
+
+    /* Hide number input arrow */
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+
+    :root {
+        --cell-height: 30px;
+        --part-count: @Model.Part;
+        --trial-count: @Model.Trial;
+        --appraiser-count: @Model.Appraiser;
+    }
+
+    .CaptionGrid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+        grid-template-rows: repeat(2, var(--cell-height));
+        background-color: blanchedalmond;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .InputGrid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+        grid-template-rows: repeat(2 + var(--trial-count), var(--cell-height));
+        background-color: antiquewhite;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .PartAvgGrid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+        grid-template-rows: repeat(1, var(--cell-height));
+        background-color: antiquewhite;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ResultGrid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+        grid-template-rows: repeat(3, var(--cell-height));
+        background-color: lightblue;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ResultGrid2 {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(6,1fr);
+        grid-template-rows: repeat(6, var(--cell-height));
+        background-color: lightblue;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .GridItem {
+        width: 100%;
+        height: 100%;
+        border: 1px solid black;
+        border-width: 0px 1px 1px 0px;
+    }
+
+        .GridItem input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+        }
+
+            .GridItem input[readonly] {
+                background-color: #eee;
+            }
+
+    .CenterContainer {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<div style="padding:4px;">
+    <form>
+        <label for="appraiser">측정자</label>
+        <input name="appraiser" value="@Model.Appraiser" />
+        <label for="trial">횟수</label>
+        <input name="trial" value="@Model.Trial" />
+        <label for="part">파트</label>
+        <input name="part" value="@Model.Part" />
+        <button type="submit">적용</button>
+    </form>
+</div>
+
+<div style="padding:4px;">
+    <label for="sl">SL</label>
+    <input id="sl" name="sl" value="24" type="number" />
+    <label for="su">SU</label>
+    <input id="su" name="su" value="24.2" type="number" />
+    <button onclick="calcuate()">calcuate</button>
+</div>
+
+
+@* 헤더  *@
+
+
+
+
+@* Captions *@
+<div class="CaptionGrid">
+    <div class="GridItem" style="grid-column:1; grid-row: 1/3;">
+        <div class="CenterContainer">
+            <span>측정자</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-column:2; grid-row: 1/3;">
+        <div class="CenterContainer">
+            <span>횟수</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-column:3/@(Model.Part + 3); grid-row: 1/2;">
+        <div class="CenterContainer">
+            <span>부품(Part)</span>
+        </div>
+    </div>
+    @for (int part = 1; part <= Model.Part; part++)
+    {
+        <div class="GridItem" style="grid-column:@(part + 2); grid-row: 2;">
+            <div class="CenterContainer">
+                <span>@part</span>
+            </div>
+        </div>
+    }
+
+    <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 1/3;">
+        <div class="CenterContainer">
+            <span>평균</span>
+        </div>
+    </div>
+</div>
+
+@for (int appraiser = 1; appraiser <= Model.Appraiser; appraiser++)
+{
+    <div class="InputGrid">
+        <div class="GridItem" style="grid-column:1; grid-row: 1/@(Model.Trial + 1);">
+            <div class="CenterContainer">
+                @*<span>@(Model.AppraiserNames[appraiser - 1])</span>*@
+                <span>@(appraiser)번</span>
+            </div>
+        </div>
+
+        @for (int trial = 1; trial <= Model.Trial; trial++)
+        {
+            <div class="GridItem" style="grid-column:2; grid-row: @trial;">
+                <div class="CenterContainer">
+                    <span>@(trial)회</span>
+                </div>
+            </div>
+
+            @for (int part = 1; part <= Model.Part; part++)
+            {
+                <div class="GridItem" style="grid-column:@(part + 2); grid-row: @trial;">
+
+                    @* 측정값 입력 *@
+                    <input id="@(GetInputId(appraiser, trial, part))"
+                           appraiser="@appraiser" trial="@(trial)" part="@(part)"
+                           type="number"
+                           onpaste="handlePaste(event)" />
+                </div>
+            }
+        }
+
+        <div class="GridItem" style="grid-column: 1/3; grid-row:@(Model.Trial + 1);">
+            <div class="CenterContainer">
+                <span>평균</span>
+            </div>
+        </div>
+
+        @* 평균 *@
+        @for (int part = 1; part <= Model.Part; part++)
+        {
+            <div class="GridItem" style="grid-column:@(part + 2); grid-row: @(Model.Trial + 1);">
+                <input id="@(GetAppraiserPartAvgId(appraiser, part))" readonly />
+            </div>
+        }
+
+        <div class="GridItem" style="grid-column: 1/3; grid-row:@(Model.Trial + 2);">
+            <div class="CenterContainer">
+                <span>범위</span>
+            </div>
+        </div>
+
+        @* 범위 *@
+        @for (int part = 1; part <= Model.Part; part++)
+        {
+            <div class="GridItem" style="grid-column:@(part + 2); grid-row: @(Model.Trial + 2);">
+
+                <input id="@(GetAppraiserPartRangeId(appraiser, part))" value="" readonly />
+            </div>
+        }
+
+        @* 전체 평균 *@
+        @for (int trial = 1; trial <= Model.Trial; trial++)
+        {
+            <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @trial;">
+                <input id="@(GetAppraiserTrialAvgId(appraiser, trial))" readonly />
+            </div>
+        }
+        <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @(Model.Trial + 1);">
+            <input id="@(GetAppraiserPartAvgAvgId(appraiser))" readonly />
+        </div>
+        <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @(Model.Trial + 2);">
+            <input id="@(GetAppraiserPartRangeAvgId(appraiser))" readonly />
+        </div>
+    </div>
+}
+
+
+@* 파트 평균 *@
+<div class="PartAvgGrid">
+    <div class="GridItem" style="grid-row: 1; grid-column:1/3;">
+        <div class="CenterContainer">
+            <span>파트평균</span>
+        </div>
+    </div>
+
+    @for (int part = 1; part <= Model.Part; part++)
+    {
+        <div class="GridItem" style="grid-row: 1; grid-column:@(part + 2);">
+            <input id="@(GetPartAvgId(part))" value="" readonly />
+        </div>
+    }
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
+        <input id="resultAvg" readonly />
+    </div>
+</div>
+
+@* 결과1 *@
+<div class="ResultGrid">
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
+        <div class="CenterContainer">
+            <span>Rp</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 2)">
+        <div class="CenterContainer">
+            <span>R__</span>
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 2);">
+        <div class="CenterContainer">
+            <span>X_Diff</span>
+        </div>
+    </div>
+
+ 
+    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
+        <input id="output-rp" readonly />
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 3);">
+        <input id="output-r__" readonly />
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 3);">
+        <input id="output-x_diff" readonly />
+    </div>
+</div>
+
+@* 결과2 *@
+<div class="ResultGrid2">
+    @* 표준편차 *@
+    <div class="GridItem" style="grid-row: 1; grid-column:1;">
+        <div class="CenterContainer">
+            <span>EV</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 2; grid-column:1; ">
+        <div class="CenterContainer">
+            <span>AV</span>
+        </div>
+    </div>
+
+
+    <div class="GridItem" style="grid-row: 3; grid-column:1; ">
+        <div class="CenterContainer">
+            <span>R&R</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 4; grid-column:1; ">
+        <div class="CenterContainer">
+            <span>PV</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row:5; grid-column: 1;">
+        <div class="CenterContainer">
+            <span>TV</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row:6; grid-column: 1;">
+        <div class="CenterContainer">
+            <span>NDC</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-column:2; grid-row: 1;">
+        <div class="CenterContainer">
+            <input id="output-ev_sd" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-column:2; grid-row: 2;">
+        <div class="CenterContainer">
+            <input id="output-av_sd" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:2; ">
+        <div class="CenterContainer">
+            <input id="grr_sd" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 4; grid-column:2; ">
+        <div class="CenterContainer">
+            <input id="output-pv_sd" readonly />
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 5; grid-column:2; ">
+        <div class="CenterContainer">
+            <input id="output-tv_sd" readonly />
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 6; grid-column:2; ">
+        <div class="CenterContainer">
+            <input id="output-ndc" readonly />
+        </div>
+    </div>
+
+
+    @* 공정변동 *@
+    <div class="GridItem" style="grid-row: 1; grid-column:3;">
+        <div class="CenterContainer">
+            <span>EV_SV(%)</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 2; grid-column:3; ">
+        <div class="CenterContainer">
+            <span>AV_SV(%)</span>
+        </div>
+    </div>
+
+
+    <div class="GridItem" style="grid-row: 3; grid-column:3; ">
+        <div class="CenterContainer">
+            <span>R&R_SV(%)</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 4; grid-column:3; ">
+        <div class="CenterContainer">
+            <span>PV_SV(%)</span>
+        </div>
+    </div>
+
+
+    <div class="GridItem" style="grid-row: 1; grid-column:4;">
+        <div class="CenterContainer">
+            <input id="output-ev_sv" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:4;">
+        <div class="CenterContainer">
+            <input id="output-av_sv" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:4; ">
+        <div class="CenterContainer">
+            <input id="output-grr_sv" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 4; grid-column:4; ">
+        <div class="CenterContainer">
+            <input id="output-pv_sv" readonly />
+        </div>
+    </div>
+
+
+    @* 공차 *@
+
+    <div class="GridItem" style="grid-row: 1; grid-column:5;">
+        <div class="CenterContainer">
+            <span>EV_T(%)</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 2; grid-column:5; ">
+        <div class="CenterContainer">
+            <span>AV_T(%)</span>
+        </div>
+    </div>
+
+
+    <div class="GridItem" style="grid-row: 3; grid-column:5; ">
+        <div class="CenterContainer">
+            <span>R&R_T(%)</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 4; grid-column:5; ">
+        <div class="CenterContainer">
+            <span>PV_T(%)</span>
+        </div>
+    </div>
+
+    <div class="GridItem" style="grid-row: 1; grid-column:6;">
+        <div class="CenterContainer">
+            <input id="output-ev_t" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 2; grid-column:6;">
+        <div class="CenterContainer">
+            <input id="output-av_t" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 3; grid-column:6; ">
+        <div class="CenterContainer">
+            <input id="output-grr_t" readonly />
+        </div>
+    </div>
+    <div class="GridItem" style="grid-row: 4; grid-column:6; ">
+        <div class="CenterContainer">
+            <input id="output-pv_t" readonly />
+        </div>
+    </div>
+
+
+
+</div>
+
+<script>
+
+
+
+    const totalAppraiser = @(Model.Appraiser);
+    const totalTrial = @(Model.Trial);
+    const totalPart = @(Model.Part);
+
+
+    function GetInputId(appraiser, trial, part) {
+        return `input-${appraiser}-${trial}-${part}`;
+    }
+    function GetAppraiserPartAvgId(appraiser, part) {
+        return `app-part-avg-${appraiser}-${part}`;
+    }
+
+    function GetAppraiserPartRangeId(appraiser, part) {
+        return `app-part-range-${appraiser}-${part}`;
+    }
+
+    function GetAppraiserTrialAvgId(appraiser, trial) {
+        return `app-trial-avg-${appraiser}-${trial}`;
+    }
+
+    function GetAppraiserPartAvgAvgId(appraiser) {
+        return `app-part-avg-avg-${appraiser}`;
+    }
+
+    function GetAppraiserPartRangeAvgId(appraiser) {
+        return `app-part-range-avg-${appraiser}`;
+    }
+
+    function GetPartAvgId(part) {
+        return `part-avg-${part}`;
+    }
+
+    function findInput(appraiser, trial, part) {
+        const id = GetInputId(appraiser, trial, part);
+        return document.getElementById(id);
+    }
+
+    function setText(appraiser, trial, part, value) {
+        const input = findInput(appraiser, trial, part);
+        if (input && value)
+            input.value = parseFloat(value);
+    }
+
+    function handlePaste(e) {
+        e.preventDefault();
+
+        const startAppraiser = e.target.attributes.appraiser.value;
+        const startTrial = parseInt(e.target.attributes.trial.value);
+        const startPart = parseInt(e.target.attributes.part.value);
+
+        let data = e.clipboardData.getData('text');
+        data = data.trim("\r\n")
+
+        let values = data.split('\r\n');
+        values = values.map(x => x.split('\t'));
+
+        const totalTrials = values.length;
+        const totalParts = values.reduce((accumulator, currentValue) => Math.max(accumulator, currentValue.length), 0);
+
+        console.log(startAppraiser, startTrial, startPart, values, totalTrials, totalParts);
+        for (let trial = 0; trial < totalTrials; trial++) {
+            for (let part = 0; part < totalParts; part++) {
+                setText(startAppraiser, startTrial + trial, startPart + part, values[trial][part]);
+            }
+        }
+    }
+
+    function printValues() {
+        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
+            for (let trial = 1; trial <= totalTrial; trial++) {
+                for (let part = 1; part <= totalPart; part++) {
+                    const input = findInput(appraiser, trial, part);
+                }
+            }
+        }
+    }
+
+    async function calcuate() {
+        const input = {};
+
+        input.AppraiserCount = totalAppraiser;
+        input.TrialCount = totalTrial;
+        input.PartCount = totalPart;
+        input.SpecLower = parseFloat(document.getElementById("sl").value);
+        input.SpecUpper = parseFloat(document.getElementById("su").value);
+        //input.Unit = "MM";
+        input.Unit = 0; // 0 for MM, 1 for INCH
+        input.Records = [];
+
+        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
+            for (let trial = 1; trial <= totalTrial; trial++) {
+                for (let part = 1; part <= totalPart; part++) {
+                    const inputelement = findInput(appraiser, trial, part);
+                    input.Records.push({
+                        Appraiser: appraiser,
+                        Trial: trial,
+                        Part: part,
+                        Value: inputelement.value ? parseFloat(inputelement.value) : 0
+                    });
+                }
+            }
+        }
+
+        const response = await fetch("/api/GageRR/Calculate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(input),
+        });
+
+        const json = await response.json();
+
+        document.getElementById("output-rp").value = json.Rp;
+
+        document.getElementById("output-r__").value = json.R__;
+        document.getElementById("output-x_diff").value = json.X_Diff;
+
+        document.getElementById("output-ev_sd").value = json.EV_SD;
+        document.getElementById("output-av_sd").value = json.AV_SD;
+        document.getElementById("grr_sd").value = json.GRR_SD;
+        document.getElementById("output-pv_sd").value = json.PV_SD;
+        document.getElementById("output-tv_sd").value = json.TV_SD;
+        document.getElementById("output-ndc").value = json.NDC;
+
+
+        document.getElementById("output-ev_sv").value = json.EV_SV;
+        document.getElementById("output-av_sv").value = json.AV_SV;
+        document.getElementById("output-grr_sv").value = json.GRR_SV;
+        document.getElementById("output-pv_sv").value = json.PV_SV;
+
+
+        document.getElementById("output-ev_t").value = json.EV_T;
+        document.getElementById("output-av_t").value = json.AV_T;
+        document.getElementById("output-grr_t").value = json.GRR_T;
+        document.getElementById("output-pv_t").value = json.PV_T;
+
+
+        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
+            for (let part = 1; part <= totalPart; part++) {
+                const avgEdit = document.getElementById(GetAppraiserPartAvgId(appraiser, part));
+                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
+
+                const rangeEdit = document.getElementById(GetAppraiserPartRangeId(appraiser, part));
+                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
+            }
+
+            for (let trial = 1; trial <= totalTrial; trial++) {
+                const trialEdit = document.getElementById(GetAppraiserTrialAvgId(appraiser, trial));
+                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
+            }
+
+            const avgAvgEdit = document.getElementById(GetAppraiserPartAvgAvgId(appraiser));
+            avgAvgEdit.value = json.AppraiserAvg[appraiser];
+
+            const rangeAvgEdit = document.getElementById(GetAppraiserPartRangeAvgId(appraiser));
+            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
+        }
+
+        for (let part = 1; part <= totalPart; part++) {
+            const partAvgEdit = document.getElementById(GetPartAvgId(part));
+            partAvgEdit.value = json.PartAvg[part];
+        }
+
+        const partAvgAvgEdit = document.getElementById('resultAvg');
+        partAvgAvgEdit.value = json.PartAvgAvg;
+
+    }
+
+</script>

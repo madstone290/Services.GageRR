@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.GageRR.Tests", "Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.GageRR.Core", "Services.GageRR.Core\Services.GageRR.Core.csproj", "{33AC189C-E59B-45F1-914D-4BC4BD553609}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.GageRR.WebApp", "Services.GageRR.WebApp\Services.GageRR.WebApp.csproj", "{55FFEDB1-8030-4B3B-B4F7-4015D81A83DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.GageRR.WebApp", "Services.GageRR.WebApp\Services.GageRR.WebApp.csproj", "{55FFEDB1-8030-4B3B-B4F7-4015D81A83DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
