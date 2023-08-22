@@ -170,4 +170,46 @@ function downloadExcel() {
         });
     });
 }
+function uploadExcel(e) {
+    if (!e.target.files)
+        return;
+    var ExcelJS = window.ExcelJS;
+    var file = e.target.files[0];
+    var wb = new ExcelJS.Workbook();
+    var reader = new FileReader();
+    var data = new Map();
+    reader.readAsArrayBuffer(file);
+    reader.onload = function () {
+        var buffer = reader.result;
+        wb.xlsx.load(buffer).then(function (workbook) {
+            workbook.eachSheet(function (sheet, _) {
+                sheet.eachRow(function (row, rowNumber) {
+                    row.eachCell(function (cell, colNumber) {
+                        if (cell.formula)
+                            console.log(colNumber, cell.formulaType, cell.value, cell.result);
+                        else
+                            console.log(colNumber, cell.value, cell.text);
+                        var dataRowNumber = rowNumber - 1;
+                        var dataColNumber = colNumber - 1;
+                        if (dataRowNumber < 1 || dataColNumber < 1)
+                            return;
+                        var appraiser = dataRowNumber;
+                        var part = dataColNumber;
+                        // 데이터 입력
+                        if (!data.has(appraiser))
+                            data.set(appraiser, new Map());
+                        data.get(appraiser).set(part, cell.value);
+                    });
+                });
+                console.log("data", data);
+                // 데이터 붙여넣기
+                for (var appraiser = 1; appraiser <= 2; appraiser++) {
+                    for (var part = 1; part <= 5; part++) {
+                        setText(appraiser, part, data.get(appraiser).get(part));
+                    }
+                }
+            });
+        });
+    };
+}
 //# sourceMappingURL=RangeMethod.js.map

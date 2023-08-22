@@ -140,7 +140,13 @@
         justify-content: center;
     }
 </style>
-
+<script>
+    window.RazorPage = {
+        AppraiserCount: @(Model.Appraiser),
+        TrialCount: @(Model.Trial),
+        PartCount: @(Model.Part),
+    }
+</script>
 <script src="~/lib/app/exceljs.js"></script>
 <script src="~/lib/app/FileSaver.js"></script>
 <script src="~/app/AverageRangeMethod.js"></script>
@@ -148,6 +154,8 @@
 
 <div>
     <button onclick="Page.downloadExcel()">엑셀다운로드</button>
+    <label for="file">엑셀업로드</label>
+    <input name="file" type="file" onchange="Page.uploadExcel(event)" />
 </div>
 <div style="padding:4px;">
     <form>
@@ -167,7 +175,7 @@
     <input id="sl" name="sl" value="24" type="number" />
     <label for="su">SU</label>
     <input id="su" name="su" value="24.2" type="number" />
-    <button onclick="calcuate()">calcuate</button>
+    <button onclick="Page.calcuate()">calcuate</button>
 </div>
 
 
@@ -235,7 +243,7 @@
                     <input id="@(GetInputId(appraiser, trial, part))"
                            appraiser="@appraiser" trial="@(trial)" part="@(part)"
                            type="number"
-                           onpaste="handlePaste(event)" />
+                           onpaste="Page.handlePaste(event)" />
                 </div>
             }
         }
@@ -323,7 +331,7 @@
         </div>
     </div>
 
- 
+
     <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
         <input id="output-rp" readonly />
     </div>
@@ -509,178 +517,3 @@
 
 
 </div>
-
-<script>
-
-
-
-    const totalAppraiser = @(Model.Appraiser);
-    const totalTrial = @(Model.Trial);
-    const totalPart = @(Model.Part);
-
-
-    function GetInputId(appraiser, trial, part) {
-        return `input-${appraiser}-${trial}-${part}`;
-    }
-    function GetAppraiserPartAvgId(appraiser, part) {
-        return `app-part-avg-${appraiser}-${part}`;
-    }
-
-    function GetAppraiserPartRangeId(appraiser, part) {
-        return `app-part-range-${appraiser}-${part}`;
-    }
-
-    function GetAppraiserTrialAvgId(appraiser, trial) {
-        return `app-trial-avg-${appraiser}-${trial}`;
-    }
-
-    function GetAppraiserPartAvgAvgId(appraiser) {
-        return `app-part-avg-avg-${appraiser}`;
-    }
-
-    function GetAppraiserPartRangeAvgId(appraiser) {
-        return `app-part-range-avg-${appraiser}`;
-    }
-
-    function GetPartAvgId(part) {
-        return `part-avg-${part}`;
-    }
-
-    function findInput(appraiser, trial, part) {
-        const id = GetInputId(appraiser, trial, part);
-        return document.getElementById(id);
-    }
-
-    function setText(appraiser, trial, part, value) {
-        const input = findInput(appraiser, trial, part);
-        if (input && value)
-            input.value = parseFloat(value);
-    }
-
-    function handlePaste(e) {
-        e.preventDefault();
-
-        const startAppraiser = e.target.attributes.appraiser.value;
-        const startTrial = parseInt(e.target.attributes.trial.value);
-        const startPart = parseInt(e.target.attributes.part.value);
-
-        let data = e.clipboardData.getData('text');
-        data = data.trim("\r\n")
-
-        let values = data.split('\r\n');
-        values = values.map(x => x.split('\t'));
-
-        const totalTrials = values.length;
-        const totalParts = values.reduce((accumulator, currentValue) => Math.max(accumulator, currentValue.length), 0);
-
-        console.log(startAppraiser, startTrial, startPart, values, totalTrials, totalParts);
-        for (let trial = 0; trial < totalTrials; trial++) {
-            for (let part = 0; part < totalParts; part++) {
-                setText(startAppraiser, startTrial + trial, startPart + part, values[trial][part]);
-            }
-        }
-    }
-
-    function printValues() {
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                for (let part = 1; part <= totalPart; part++) {
-                    const input = findInput(appraiser, trial, part);
-                }
-            }
-        }
-    }
-
-    async function calcuate() {
-        const input = {};
-
-        input.AppraiserCount = totalAppraiser;
-        input.TrialCount = totalTrial;
-        input.PartCount = totalPart;
-        input.SpecLower = parseFloat(document.getElementById("sl").value);
-        input.SpecUpper = parseFloat(document.getElementById("su").value);
-        //input.Unit = "MM";
-        input.Unit = 0; // 0 for MM, 1 for INCH
-        input.Records = [];
-
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                for (let part = 1; part <= totalPart; part++) {
-                    const inputelement = findInput(appraiser, trial, part);
-                    input.Records.push({
-                        Appraiser: appraiser,
-                        Trial: trial,
-                        Part: part,
-                        Value: inputelement.value ? parseFloat(inputelement.value) : 0
-                    });
-                }
-            }
-        }
-
-        const response = await fetch("/api/GageRR/AverageRange", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(input),
-        });
-
-        const json = await response.json();
-
-        document.getElementById("output-rp").value = json.Rp;
-
-        document.getElementById("output-r__").value = json.R__;
-        document.getElementById("output-x_diff").value = json.X_Diff;
-
-        document.getElementById("output-ev_sd").value = json.EV_SD;
-        document.getElementById("output-av_sd").value = json.AV_SD;
-        document.getElementById("grr_sd").value = json.GRR_SD;
-        document.getElementById("output-pv_sd").value = json.PV_SD;
-        document.getElementById("output-tv_sd").value = json.TV_SD;
-        document.getElementById("output-ndc").value = json.NDC;
-
-
-        document.getElementById("output-ev_sv").value = json.EV_SV;
-        document.getElementById("output-av_sv").value = json.AV_SV;
-        document.getElementById("output-grr_sv").value = json.GRR_SV;
-        document.getElementById("output-pv_sv").value = json.PV_SV;
-
-
-        document.getElementById("output-ev_t").value = json.EV_T;
-        document.getElementById("output-av_t").value = json.AV_T;
-        document.getElementById("output-grr_t").value = json.GRR_T;
-        document.getElementById("output-pv_t").value = json.PV_T;
-
-
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let part = 1; part <= totalPart; part++) {
-                const avgEdit = document.getElementById(GetAppraiserPartAvgId(appraiser, part));
-                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
-
-                const rangeEdit = document.getElementById(GetAppraiserPartRangeId(appraiser, part));
-                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
-            }
-
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                const trialEdit = document.getElementById(GetAppraiserTrialAvgId(appraiser, trial));
-                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
-            }
-
-            const avgAvgEdit = document.getElementById(GetAppraiserPartAvgAvgId(appraiser));
-            avgAvgEdit.value = json.AppraiserAvg[appraiser];
-
-            const rangeAvgEdit = document.getElementById(GetAppraiserPartRangeAvgId(appraiser));
-            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
-        }
-
-        for (let part = 1; part <= totalPart; part++) {
-            const partAvgEdit = document.getElementById(GetPartAvgId(part));
-            partAvgEdit.value = json.PartAvg[part];
-        }
-
-        const partAvgAvgEdit = document.getElementById('resultAvg');
-        partAvgAvgEdit.value = json.PartAvgAvg;
-
-    }
-
-</script>

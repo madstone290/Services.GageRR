@@ -144,3 +144,55 @@ async function downloadExcel() {
     const saveAs = (window as any).saveAs;
     saveAs(blob, fileName);
 }
+
+function uploadExcel(e) {
+    if (!e.target.files)
+        return;
+
+    const ExcelJS = (window as any).ExcelJS;
+
+    const file = e.target.files[0];
+    const wb = new ExcelJS.Workbook();
+    const reader = new FileReader()
+
+    const data = new Map<number, Map<number, number>>();
+
+    reader.readAsArrayBuffer(file)
+    reader.onload = () => {
+        const buffer = reader.result as ArrayBuffer;
+        wb.xlsx.load(buffer).then(workbook => {
+            workbook.eachSheet((sheet, _) => {
+                sheet.eachRow((row, rowNumber) => {
+                    row.eachCell((cell, colNumber) => {
+                        if (cell.formula)
+                            console.log(colNumber, cell.formulaType, cell.value, cell.result);
+                        else
+                            console.log(colNumber, cell.value, cell.text);
+
+                        const dataRowNumber = rowNumber - 1;
+                        const dataColNumber = colNumber - 1;
+                        if (dataRowNumber < 1 || dataColNumber < 1)
+                            return;
+
+                        const appraiser = dataRowNumber;
+                        const part = dataColNumber;
+
+                        // 데이터 입력
+                        if(!data.has(appraiser))
+                            data.set(appraiser, new Map<number, number>());
+                        data.get(appraiser).set(part, cell.value);
+
+                    });
+                })
+                console.log("data", data);
+                // 데이터 붙여넣기
+                for (let appraiser = 1; appraiser <= 2; appraiser++) {
+                    for (let part = 1; part <= 5; part++) {
+                        setText(appraiser, part, data.get(appraiser).get(part));
+                    }
+                }
+            })
+        })
+    };
+
+}

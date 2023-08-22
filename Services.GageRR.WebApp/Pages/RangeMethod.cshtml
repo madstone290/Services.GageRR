@@ -131,7 +131,10 @@
 
 <div>
     <button onclick="downloadExcel()">엑셀다운로드</button>
+    <label for="file">엑셀업로드</label>
+    <input name="file" type="file" onchange="uploadExcel(event)" />
 </div>
+
 <div style="padding:4px;">
     <form>
         <label for="appraiser">측정자</label>

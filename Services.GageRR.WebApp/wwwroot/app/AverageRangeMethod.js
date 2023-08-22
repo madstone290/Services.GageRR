@@ -54,8 +54,198 @@ var AverageRangeMethod = function () {
             });
         });
     }
+    function uploadExcel(e) {
+        if (!e.target.files)
+            return;
+        var ExcelJS = window.ExcelJS;
+        var file = e.target.files[0];
+        var wb = new ExcelJS.Workbook();
+        var reader = new FileReader();
+        var data = new Map();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function () {
+            var buffer = reader.result;
+            wb.xlsx.load(buffer).then(function (workbook) {
+                workbook.eachSheet(function (sheet, _) {
+                    sheet.eachRow(function (row, rowNumber) {
+                        row.eachCell(function (cell, colNumber) {
+                            if (cell.formula)
+                                console.log(colNumber, cell.formulaType, cell.value, cell.result);
+                            else
+                                console.log(colNumber, cell.value, cell.text);
+                            var dataRowNumber = rowNumber - 1;
+                            var dataColNumber = colNumber - 2;
+                            if (dataRowNumber < 1 || dataColNumber < 1)
+                                return;
+                            var appraiser = Math.floor((dataRowNumber - 1) / 3) + 1;
+                            var trial = (dataRowNumber - 1) % 3 + 1;
+                            var part = dataColNumber;
+                            // 데이터 입력
+                            if (!data.has(appraiser)) {
+                                data.set(appraiser, new Map());
+                            }
+                            if (!data.get(appraiser).has(trial)) {
+                                data.get(appraiser).set(trial, new Map());
+                            }
+                            data.get(appraiser).get(trial).set(part, cell.value);
+                        });
+                    });
+                    console.log("data", data);
+                    // 데이터 붙여넣기
+                    for (var appraiser = 1; appraiser <= 3; appraiser++) {
+                        for (var trial = 1; trial <= 3; trial++) {
+                            for (var part = 1; part <= 10; part++) {
+                                setText(appraiser, trial, part, data.get(appraiser).get(trial).get(part));
+                            }
+                        }
+                    }
+                });
+            });
+        };
+    }
+    function GetInputId(appraiser, trial, part) {
+        return "input-".concat(appraiser, "-").concat(trial, "-").concat(part);
+    }
+    function GetAppraiserPartAvgId(appraiser, part) {
+        return "app-part-avg-".concat(appraiser, "-").concat(part);
+    }
+    function GetAppraiserPartRangeId(appraiser, part) {
+        return "app-part-range-".concat(appraiser, "-").concat(part);
+    }
+    function GetAppraiserTrialAvgId(appraiser, trial) {
+        return "app-trial-avg-".concat(appraiser, "-").concat(trial);
+    }
+    function GetAppraiserPartAvgAvgId(appraiser) {
+        return "app-part-avg-avg-".concat(appraiser);
+    }
+    function GetAppraiserPartRangeAvgId(appraiser) {
+        return "app-part-range-avg-".concat(appraiser);
+    }
+    function GetPartAvgId(part) {
+        return "part-avg-".concat(part);
+    }
+    function findInput(appraiser, trial, part) {
+        var id = GetInputId(appraiser, trial, part);
+        return document.getElementById(id);
+    }
+    function findInputById(id) {
+        return document.getElementById(id);
+    }
+    function setText(appraiser, trial, part, value) {
+        var input = findInput(appraiser, trial, part);
+        if (input && value)
+            input.value = parseFloat(value).toString();
+    }
+    function handlePaste(e) {
+        e.preventDefault();
+        var startAppraiser = e.target.attributes.appraiser.value;
+        var startTrial = parseInt(e.target.attributes.trial.value);
+        var startPart = parseInt(e.target.attributes.part.value);
+        var data = e.clipboardData.getData('text');
+        data = data.trim("\r\n");
+        var values = data.split('\r\n');
+        values = values.map(function (x) { return x.split('\t'); });
+        var totalTrials = values.length;
+        var totalParts = values.reduce(function (accumulator, currentValue) { return Math.max(accumulator, currentValue.length); }, 0);
+        console.log(startAppraiser, startTrial, startPart, values, totalTrials, totalParts);
+        for (var trial = 0; trial < totalTrials; trial++) {
+            for (var part = 0; part < totalParts; part++) {
+                setText(startAppraiser, startTrial + trial, startPart + part, values[trial][part]);
+            }
+        }
+    }
+    function calcuate() {
+        return __awaiter(this, void 0, void 0, function () {
+            var totalAppraiser, totalTrial, totalPart, input, appraiser, trial, part, inputelement, response, json, appraiser, part, avgEdit, rangeEdit, trial, trialEdit, avgAvgEdit, rangeAvgEdit, part, partAvgEdit, partAvgAvgEdit;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        totalAppraiser = window.RazorPage.AppraiserCount;
+                        totalTrial = window.RazorPage.TrialCount;
+                        totalPart = window.RazorPage.PartCount;
+                        input = {};
+                        input.AppraiserCount = totalAppraiser;
+                        input.TrialCount = totalTrial;
+                        input.PartCount = totalPart;
+                        input.SpecLower = parseFloat(findInputById("sl").value);
+                        input.SpecUpper = parseFloat(findInputById("su").value);
+                        //input.Unit = "MM";
+                        input.Unit = 0; // 0 for MM, 1 for INCH
+                        input.Records = [];
+                        for (appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
+                            for (trial = 1; trial <= totalTrial; trial++) {
+                                for (part = 1; part <= totalPart; part++) {
+                                    inputelement = findInput(appraiser, trial, part);
+                                    input.Records.push({
+                                        Appraiser: appraiser,
+                                        Trial: trial,
+                                        Part: part,
+                                        Value: inputelement.value ? parseFloat(inputelement.value) : 0
+                                    });
+                                }
+                            }
+                        }
+                        return [4 /*yield*/, fetch("/api/GageRR/AverageRange", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(input),
+                            })];
+                    case 1:
+                        response = _a.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        json = _a.sent();
+                        findInputById("output-rp").value = json.Rp;
+                        findInputById("output-r__").value = json.R__;
+                        findInputById("output-x_diff").value = json.X_Diff;
+                        findInputById("output-ev_sd").value = json.EV_SD;
+                        findInputById("output-av_sd").value = json.AV_SD;
+                        findInputById("grr_sd").value = json.GRR_SD;
+                        findInputById("output-pv_sd").value = json.PV_SD;
+                        findInputById("output-tv_sd").value = json.TV_SD;
+                        findInputById("output-ndc").value = json.NDC;
+                        findInputById("output-ev_sv").value = json.EV_SV;
+                        findInputById("output-av_sv").value = json.AV_SV;
+                        findInputById("output-grr_sv").value = json.GRR_SV;
+                        findInputById("output-pv_sv").value = json.PV_SV;
+                        findInputById("output-ev_t").value = json.EV_T;
+                        findInputById("output-av_t").value = json.AV_T;
+                        findInputById("output-grr_t").value = json.GRR_T;
+                        findInputById("output-pv_t").value = json.PV_T;
+                        for (appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
+                            for (part = 1; part <= totalPart; part++) {
+                                avgEdit = findInputById(GetAppraiserPartAvgId(appraiser, part));
+                                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
+                                rangeEdit = findInputById(GetAppraiserPartRangeId(appraiser, part));
+                                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
+                            }
+                            for (trial = 1; trial <= totalTrial; trial++) {
+                                trialEdit = findInputById(GetAppraiserTrialAvgId(appraiser, trial));
+                                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
+                            }
+                            avgAvgEdit = findInputById(GetAppraiserPartAvgAvgId(appraiser));
+                            avgAvgEdit.value = json.AppraiserAvg[appraiser];
+                            rangeAvgEdit = findInputById(GetAppraiserPartRangeAvgId(appraiser));
+                            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
+                        }
+                        for (part = 1; part <= totalPart; part++) {
+                            partAvgEdit = findInputById(GetPartAvgId(part));
+                            partAvgEdit.value = json.PartAvg[part];
+                        }
+                        partAvgAvgEdit = findInputById('resultAvg');
+                        partAvgAvgEdit.value = json.PartAvgAvg;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    }
     return {
-        downloadExcel: downloadExcel
+        downloadExcel: downloadExcel,
+        uploadExcel: uploadExcel,
+        handlePaste: handlePaste,
+        calcuate: calcuate
     };
 }();
 window.Page = AverageRangeMethod;
