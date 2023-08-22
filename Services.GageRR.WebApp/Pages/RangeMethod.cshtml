@@ -124,8 +124,14 @@
         partCount: @(Model.Part)
     };
 </script>
+
+<script src="~/lib/app/exceljs.js"></script>
+<script src="~/lib/app/FileSaver.js"></script>
 <script src="~/app/RangeMethod.js"></script>
 
+<div>
+    <button onclick="downloadExcel()">엑셀다운로드</button>
+</div>
 <div style="padding:4px;">
     <form>
         <label for="appraiser">측정자</label>

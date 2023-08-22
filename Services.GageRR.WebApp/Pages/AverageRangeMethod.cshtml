@@ -141,6 +141,14 @@
     }
 </style>
 
+<script src="~/lib/app/exceljs.js"></script>
+<script src="~/lib/app/FileSaver.js"></script>
+<script src="~/app/AverageRangeMethod.js"></script>
+
+
+<div>
+    <button onclick="Page.downloadExcel()">엑셀다운로드</button>
+</div>
 <div style="padding:4px;">
     <form>
         <label for="appraiser">측정자</label>
@@ -152,6 +160,7 @@
         <button type="submit">적용</button>
     </form>
 </div>
+
 
 <div style="padding:4px;">
     <label for="sl">SL</label>

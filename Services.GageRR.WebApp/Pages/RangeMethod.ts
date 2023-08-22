@@ -58,7 +58,7 @@ async function calcuate() {
     const appraiserCount = basicInfo.appraiserCount;
     const partCount = basicInfo.partCount;
 
-    const input :any = {};
+    const input: any = {};
     input.AppraiserCount = basicInfo.appraiserCount;
     input.PartCount = basicInfo.partCount;
     input.SpecLower = parseFloat(findInputById("sl").value);
@@ -104,4 +104,43 @@ async function calcuate() {
 
     findInputById(GetRangeAvgId()).value = json.R_;
 
+}
+
+
+function downloadExcelDynamic() {
+    const Workbook = (window as any).ExcelJS.Workbook;
+    const workbook = new Workbook();
+    workbook.addWorksheet("Sheet1");
+
+    const ws = workbook.getWorksheet("Sheet1");
+
+    ws.getCell('A1').value = 'John Doe';
+    ws.getCell('B1').value = 'gardener';
+    ws.getCell('C1').value = new Date().toLocaleString();
+
+
+    const r3 = ws.getRow(3);
+    r3.values = [1, 2, 3, 4, 5, 6];
+
+    const fileName = 'simple.xlsx';
+
+    const saveAs = (window as any).saveAs;
+    workbook.xlsx
+        .writeBuffer()
+        .then(buffer => saveAs(new Blob([buffer]), `${fileName}_${Date.now()}.xlsx`))
+        .then(() => {
+            console.log('file created');
+        })
+        .catch(err => {
+            console.log(err.message);
+        });
+}
+
+async function downloadExcel() {
+    const response = await fetch("/files/GageRange.xlsx");
+    const blob = await response.blob();
+    const fileName = 'GageRange.xlsx';
+
+    const saveAs = (window as any).saveAs;
+    saveAs(blob, fileName);
 }

@@ -6,7 +6,10 @@
         "removeComments": false,
         "sourceMap": true,
         "target": "es5",
-        "outDir": "wwwroot/app"
+        "outDir": "wwwroot/app",
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     },
     "include": [
         "Pages/**/*"

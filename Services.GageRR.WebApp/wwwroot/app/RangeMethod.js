@@ -129,4 +129,45 @@ function calcuate() {
         });
     });
 }
+function downloadExcelDynamic() {
+    var Workbook = window.ExcelJS.Workbook;
+    var workbook = new Workbook();
+    workbook.addWorksheet("Sheet1");
+    var ws = workbook.getWorksheet("Sheet1");
+    ws.getCell('A1').value = 'John Doe';
+    ws.getCell('B1').value = 'gardener';
+    ws.getCell('C1').value = new Date().toLocaleString();
+    var r3 = ws.getRow(3);
+    r3.values = [1, 2, 3, 4, 5, 6];
+    var fileName = 'simple.xlsx';
+    var saveAs = window.saveAs;
+    workbook.xlsx
+        .writeBuffer()
+        .then(function (buffer) { return saveAs(new Blob([buffer]), "".concat(fileName, "_").concat(Date.now(), ".xlsx")); })
+        .then(function () {
+        console.log('file created');
+    })
+        .catch(function (err) {
+        console.log(err.message);
+    });
+}
+function downloadExcel() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, blob, fileName, saveAs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch("/files/GageRange.xlsx")];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.blob()];
+                case 2:
+                    blob = _a.sent();
+                    fileName = 'GageRange.xlsx';
+                    saveAs = window.saveAs;
+                    saveAs(blob, fileName);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 //# sourceMappingURL=RangeMethod.js.map
