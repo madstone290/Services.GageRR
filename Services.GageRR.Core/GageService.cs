@@ -43,6 +43,11 @@ namespace Services.GageRR.Core
         /// <returns></returns>
         public RangeOutput RangeMethod(RangeInput input)
         {
+            var appraiserAvg = input.Records.GroupBy(x => x.Appraiser)
+                .ToDictionary(
+                    appraiserGroup => appraiserGroup.Key,
+                    appraiserGroup => appraiserGroup.Average(x => x.Value));
+
             var partRange = input.Records.GroupBy(x => x.Part)
                 .ToDictionary(
                     partGroup => partGroup.Key,
@@ -54,6 +59,7 @@ namespace Services.GageRR.Core
 
             RangeOutput output = new ()
             {
+                AppraiserAvg = appraiserAvg,
                 PartRange = partRange,
                 R_ = r_,
                 GRR = grr,

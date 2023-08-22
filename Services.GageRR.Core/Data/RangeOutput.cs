@@ -6,6 +6,11 @@
     public record RangeOutput
     {
         /// <summary>
+        /// 측정자별 평균
+        /// </summary>
+        public Dictionary<int, decimal> AppraiserAvg { get; set; } = new Dictionary<int, decimal>();
+
+        /// <summary>
         /// 부품별 범위
         /// </summary>
         public Dictionary<int, decimal> PartRange { get; set; } = new Dictionary<int, decimal>();
@@ -27,7 +32,12 @@
 
         public void Round(int digit = 3)
         {
-            foreach(var key in PartRange.Keys.ToList())
+            foreach (var key in AppraiserAvg.Keys.ToList())
+            {
+                AppraiserAvg[key] = Math.Round(AppraiserAvg[key], digit);
+            }
+
+            foreach (var key in PartRange.Keys.ToList())
             {
                 PartRange[key] = Math.Round(PartRange[key], digit);
             }
