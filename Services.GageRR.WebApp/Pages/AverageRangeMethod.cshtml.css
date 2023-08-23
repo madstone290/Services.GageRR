@@ -24,7 +24,7 @@ input[type=number] {
     display: grid;
     width: 100%;
     grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
-    grid-template-rows: repeat(2 + var(--trial-count), var(--cell-height));
+    grid-template-rows: repeat(calc(2 + var(--trial-count)), var(--cell-height));
     background-color: antiquewhite;
     align-items: center;
     justify-content: center;
