@@ -7,16 +7,6 @@ namespace Services.GageRR.Core
     /// </summary>
     public class GageService
     {
-        /**
-         * n: part count
-         * r: trial count
-         * x_diff: 평가자평균max - 평가자평균min
-         * EV = R__ * K1
-         * AV = Sqrt((X_diff * K2)^2 - EV^2/nr)
-         * GRR = Sqrt(EV^2 + AV^2)
-         * PV = Rp * K3
-         * TV = Sqrt( GRR^2 + PV^2 )
-         * */
 
         /// <summary>
         /// AverageRange method 계산 상수
@@ -57,7 +47,7 @@ namespace Services.GageRR.Core
             var grr = r_.M(RANGE_CONSTANT).D(RANGE_D2_CONSTANT);
             var grr_t = grr.M(100).D(input.Tolerance);
 
-            RangeOutput output = new ()
+            RangeOutput output = new()
             {
                 AppraiserAvg = appraiserAvg,
                 PartRange = partRange,
@@ -76,6 +66,19 @@ namespace Services.GageRR.Core
         /// <returns></returns>
         public AverageRangeOutput AverageRangeMethod(AverageRangeInput input)
         {
+            /**
+            * n: part count
+            * r: trial count
+            * x_diff: 평가자평균max - 평가자평균min
+            * EV = R__ * K1
+            * AV = Sqrt((X_diff * K2)^2 - EV^2/nr)
+            * GRR = Sqrt(EV^2 + AV^2)
+            * PV = Rp * K3
+            * TV = Sqrt( GRR^2 + PV^2 )
+            * */
+
+
+
             _inputValidator.Validate(input);
 
             var records = input.Records;
