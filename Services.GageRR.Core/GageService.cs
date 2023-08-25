@@ -192,5 +192,98 @@ namespace Services.GageRR.Core
 
             return output;
         }
+
+        public AnovaOutput AnovaMethod(AverageRangeInput input)
+        {
+            var records = input.Records;
+
+            decimal x__ = records.Average(x => x.Value);
+            var x_o = records.GroupBy(x => x.Appraiser)
+                .ToDictionary(
+                    @operator => @operator.Key,
+                    @operator => @operator.Average(x => x.Value));
+
+            var x_p = records.GroupBy(x => x.Part)
+                .ToDictionary(
+                    part => part.Key,
+                    part => part.Average(x => x.Value));
+
+            var x_op = records.GroupBy(x => new
+            {
+                x.Appraiser,
+                x.Part
+            })
+                .ToDictionary(
+                    op => op.Key,
+                    op => op.Average(x => x.Value));
+
+            int o = input.AppraiserCount;
+            int p = input.PartCount;
+            int r = input.TrialCount;
+
+            int df_o = input.AppraiserCount - 1;
+            int df_p = input.PartCount - 1;
+            int df_op = df_o * df_p;
+            int df_r = input.AppraiserCount * input.PartCount * (input.TrialCount - 1);
+            int df_total = input.AppraiserCount * input.PartCount * input.TrialCount - 1;
+
+            decimal ss_o = p * r * x_o.Sum(x_o_each => (x_o_each.Value - x__).P(2));
+            decimal ss_p = o * r * x_p.Sum(x_p_each => (x_p_each.Value - x__).P(2));
+            decimal ss_total = records.Sum(r_each => (r_each.Value - x__).P(2));
+            decimal ss_r = records.Sum(r_each =>
+            {
+                var opId = new
+                {
+                    r_each.Appraiser,
+                    r_each.Part
+                };
+                return (r_each.Value - x_op[opId]).P(2);
+            });
+            decimal ss_op = ss_total - ss_o - ss_p - ss_r;
+
+            decimal ms_o = ss_o / df_o;
+            decimal ms_p = ss_p / df_p;
+            decimal ms_op = ss_op / df_op;
+            decimal ms_r = ss_r / df_r;
+
+            decimal f_o = ms_o / ms_op;
+            decimal f_p = ms_p / ms_op;
+            decimal f_op = ms_op / ms_r;
+
+            decimal p_o = 1 - (decimal)alglib.fdistribution(df_o, df_op, (double)f_o);
+            decimal p_p = 1 - (decimal)alglib.fdistribution(df_p, df_op, (double)f_p);
+            decimal p_op = 1 - (decimal)alglib.fdistribution(df_op, df_r, (double)f_op);
+
+
+            return new AnovaOutput()
+            {
+                DF_Operator = df_o,
+                DF_Part = df_p,
+                DF_Operator_Part = df_op,
+                DF_Repeatability = df_r,
+                DF_Total = df_total,
+
+                SS_Operator = (double)ss_o,
+                SS_Part = (double)ss_p,
+                SS_Operator_Part = (double)ss_op,
+                SS_Repeatability = (double)ss_r,
+                SS_Total = (double)ss_total,
+
+                MS_Operator = (double)ms_o,
+                MS_Part = (double)ms_p,
+                MS_Operator_Part = (double)ms_op,
+                MS_Repeatability = (double)ms_r,
+
+                F_Operator = (double)f_o,
+                F_Part = (double)f_p,
+                F_Operator_Part = (double)f_op,
+
+                P_Operator = (double)p_o,
+                P_Part = (double)p_p,
+                P_Operator_Part = (double)p_op
+            };
+        }
     }
+
 }
+
