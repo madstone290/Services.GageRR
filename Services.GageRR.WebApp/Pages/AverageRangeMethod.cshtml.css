@@ -10,6 +10,33 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
+.Page {
+    width: 1200px;
+}
+
+.Toolbar {
+    padding: 10px 20px 10px 20px;
+}
+
+.Form {
+    padding: 10px 20px 10px 20px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    grid-column-gap: 10px;
+}
+
+.Button {
+    display: inline-block;
+    background-color: #eee;
+    border: solid 1px #111;
+    padding: 2px 4px 2px 4px;
+    cursor: pointer;
+}
+
+
 .CaptionGrid {
     display: grid;
     width: 100%;

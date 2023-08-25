@@ -62,34 +62,55 @@
 <script src="~/lib/app/FileSaver.js"></script>
 <script src="~/app/AverageRangeMethod.js"></script>
 
-<div class="Page"> 
-    <div>
-        <button onclick="Page.downloadExcel()">엑셀다운로드</button>
-        <label for="file">엑셀업로드</label>
-        <input name="file" type="file" onchange="Page.uploadExcel(event)" />
+<div class="Page">
+    <div class="Toolbar">
+        <button class="Button" onclick="Page.downloadExcel()">엑셀다운로드</button>
+        <label for="file" class="Button">엑셀업로드</label>
+        <input id="file" type="file" style="display:none;" onchange="Page.uploadExcel(event)" />
     </div>
-    <div style="padding:4px;">
-        <form>
-            <label for="appraiser">측정자</label>
-            <input name="appraiser" value="@Model.Appraiser" />
-            <label for="trial">횟수</label>
-            <input name="trial" value="@Model.Trial" />
-            <label for="part">파트</label>
-            <input name="part" value="@Model.Part" />
-            <button type="submit">적용</button>
-        </form>
+    <form>
+        <div class="Form">
+            <div style="grid-row:1; grid-column: 1; justify-self:end;">
+                <label for="appraiser">측정자</label>
+            </div>
+            <div style="grid-row:1; grid-column: 2;">
+                <input name="appraiser" value="@Model.Appraiser" />
+            </div>
+            <div style="grid-column: 3; justify-self:end;">
+                <label for="trial">파트</label>
+            </div>
+            <div style="grid-column: 4;">
+                <input name="part" value="@Model.Part" />
+            </div>
+            <div style="grid-column: 5; justify-self:end;">
+                <label for="trial">반복</label>
+            </div>
+            <div style="grid-column: 6;">
+                <input name="part" value="@Model.Part" />
+            </div>
+            <div style="grid-column: 7/9;">
+                <button type="submit">레이아웃 적용</button>
+            </div>
+        </div>
+    </form>
+    <div class="Form">
+        <div style="grid-row:1; grid-column: 1; justify-self:end;">
+            <label for="sl">규격하한(SL)</label>
+        </div>
+        <div style="grid-row:1; grid-column: 2;">
+
+            <input id="sl" name="sl" value="24" type="number" />
+        </div>
+        <div style="grid-column: 3; justify-self:end;">
+            <label for="su">규격상한(SU)</label>
+        </div>
+        <div style="grid-column: 4;">
+            <input id="su" name="su" value="24.2" type="number" />
+        </div>
+        <div style="grid-column: 5/7;">
+            <button onclick="Page.calcuate()">Gage R&R 계산</button>
+        </div>
     </div>
-
-
-    <div style="padding:4px;">
-        <label for="sl">SL</label>
-        <input id="sl" name="sl" value="24" type="number" />
-        <label for="su">SU</label>
-        <input id="su" name="su" value="24.2" type="number" />
-        <button onclick="Page.calcuate()">calcuate</button>
-    </div>
-
-
     @* 헤더  *@
 
 

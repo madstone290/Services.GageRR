@@ -46,9 +46,9 @@
 
 <div class="Page">
     <div class="Toolbar">
-        <button class="Button" onclick="downloadExcel()">엑셀다운로드</button>
+        <button class="Button" onclick="Page.downloadExcel()">엑셀다운로드</button>
         <label for="file" class="Button">엑셀업로드</label>
-        <input id="file" type="file" style="display:none;" onchange="uploadExcel(event)" />
+        <input id="file" type="file" style="display:none;" onchange="Page.uploadExcel(event)" />
     </div>
     <form>
         <div class="Form">
@@ -84,7 +84,7 @@
             <input id="su" name="su" value="24.2" type="number" />
         </div>
         <div style="grid-column: 5/7;">
-            <button onclick="calcuate()">Gage R&R 계산</button>
+            <button onclick="Page.calcuate()">Gage R&R 계산</button>
         </div>
     </div>
 
@@ -133,7 +133,7 @@
                     <input id="@(GetInputId(appraiser, part))"
                            appraiser="@appraiser" part="@(part)"
                            type="number"
-                           onpaste="handlePaste(event)" />
+                           onpaste="Page.handlePaste(event)" />
                 </div>
             }
             <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">

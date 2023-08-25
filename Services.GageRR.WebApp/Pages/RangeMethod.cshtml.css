@@ -32,9 +32,6 @@ input[type=number] {
     cursor: pointer;
 }
 
-
-
-
 .CaptionGrid {
     display: grid;
     width: 100%;
