@@ -157,13 +157,13 @@ var RangeMethod = function () {
             var response, blob, fileName, saveAs;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch("/files/GageRange.xlsx")];
+                    case 0: return [4 /*yield*/, fetch("/files/RangeInput.xlsx")];
                     case 1:
                         response = _a.sent();
                         return [4 /*yield*/, response.blob()];
                     case 2:
                         blob = _a.sent();
-                        fileName = 'GageRange.xlsx';
+                        fileName = 'RangeInput.xlsx';
                         saveAs = window.saveAs;
                         saveAs(blob, fileName);
                         return [2 /*return*/];

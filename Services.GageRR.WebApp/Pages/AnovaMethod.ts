@@ -1,8 +1,8 @@
-﻿const AverageRangeMethod = function () {
+﻿const AnovaMethod = function () {
     async function downloadExcel() {
-        const response = await fetch("/files/AverageRangeInput.xlsx");
+        const response = await fetch("/files/AnovaInput.xlsx");
         const blob = await response.blob();
-        const fileName = 'AverageRangeInput.xlsx';
+        const fileName = 'AnovaInput.xlsx';
 
         const saveAs = (window as any).saveAs;
         saveAs(blob, fileName);
@@ -146,10 +146,6 @@
         input.AppraiserCount = totalAppraiser;
         input.TrialCount = totalTrial;
         input.PartCount = totalPart;
-        input.SpecLower = parseFloat(findInputById("sl").value);
-        input.SpecUpper = parseFloat(findInputById("su").value);
-        //input.Unit = "MM";
-        input.Unit = 0; // 0 for MM, 1 for INCH
         input.Records = [];
 
         for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
@@ -166,7 +162,7 @@
             }
         }
 
-        const response = await fetch("/api/GageRR/AverageRange", {
+        const response = await fetch("/api/GageRR/Anova", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -176,59 +172,31 @@
 
         const json = await response.json();
 
-        findInputById("output-rp").value = json.Rp;
+        findInputById("output-df_o").value = json.DF_Operator;
+        findInputById("output-df_p").value = json.DF_Part;
+        findInputById("output-df_op").value = json.DF_Operator_Part;
+        findInputById("output-df_r").value = json.DF_Repeatability;
+        findInputById("output-df_total").value = json.DF_Total;
 
-        findInputById("output-r__").value = json.R__;
-        findInputById("output-x_diff").value = json.X_Diff;
+        findInputById("output-ss_o").value = json.SS_Operator;
+        findInputById("output-ss_p").value = json.SS_Part;
+        findInputById("output-ss_op").value = json.SS_Operator_Part;
+        findInputById("output-ss_r").value = json.SS_Repeatability;
+        findInputById("output-ss_total").value = json.SS_Total;
 
-        findInputById("output-ev_sd").value = json.EV_SD;
-        findInputById("output-av_sd").value = json.AV_SD;
-        findInputById("grr_sd").value = json.GRR_SD;
-        findInputById("output-pv_sd").value = json.PV_SD;
-        findInputById("output-tv_sd").value = json.TV_SD;
-        findInputById("output-ndc").value = json.NDC;
+        findInputById("output-ms_o").value = json.MS_Operator;
+        findInputById("output-ms_p").value = json.MS_Part;
+        findInputById("output-ms_op").value = json.MS_Operator_Part;
+        findInputById("output-ms_r").value = json.MS_Repeatability;
 
+        findInputById("output-f_o").value = json.F_Operator;
+        findInputById("output-f_p").value = json.F_Part;
+        findInputById("output-f_op").value = json.F_Operator_Part;
 
-        findInputById("output-ev_sv").value = json.EV_SV;
-        findInputById("output-av_sv").value = json.AV_SV;
-        findInputById("output-grr_sv").value = json.GRR_SV;
-        findInputById("output-pv_sv").value = json.PV_SV;
+        findInputById("output-p_o").value = json.P_Operator;
+        findInputById("output-p_p").value = json.P_Part;
+        findInputById("output-p_op").value = json.P_Operator_Part;
 
-
-        findInputById("output-ev_t").value = json.EV_T;
-        findInputById("output-av_t").value = json.AV_T;
-        findInputById("output-grr_t").value = json.GRR_T;
-        findInputById("output-pv_t").value = json.PV_T;
-
-
-        for (let appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-            for (let part = 1; part <= totalPart; part++) {
-                const avgEdit = findInputById(GetAppraiserPartAvgId(appraiser, part));
-                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
-
-                const rangeEdit = findInputById(GetAppraiserPartRangeId(appraiser, part));
-                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
-            }
-
-            for (let trial = 1; trial <= totalTrial; trial++) {
-                const trialEdit = findInputById(GetAppraiserTrialAvgId(appraiser, trial));
-                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
-            }
-
-            const avgAvgEdit = findInputById(GetAppraiserPartAvgAvgId(appraiser));
-            avgAvgEdit.value = json.AppraiserAvg[appraiser];
-
-            const rangeAvgEdit = findInputById(GetAppraiserPartRangeAvgId(appraiser));
-            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
-        }
-
-        for (let part = 1; part <= totalPart; part++) {
-            const partAvgEdit = findInputById(GetPartAvgId(part));
-            partAvgEdit.value = json.PartAvg[part];
-        }
-
-        const partAvgAvgEdit = findInputById('resultAvg');
-        partAvgAvgEdit.value = json.PartAvgAvg;
 
     }
 
@@ -240,4 +208,4 @@
     }
 }();
 
-(window as any).Page = AverageRangeMethod;
+(window as any).Page = AnovaMethod;

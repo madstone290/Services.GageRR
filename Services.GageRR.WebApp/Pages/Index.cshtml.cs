@@ -5,9 +5,8 @@ namespace Services.GageRR.WebApp.Pages
 {
     public class IndexModel : PageModel
     {
-        public IActionResult OnGet()
+        public void OnGet()
         {
-            return LocalRedirect("/AverageRangeMethod");
         }
     }
 }

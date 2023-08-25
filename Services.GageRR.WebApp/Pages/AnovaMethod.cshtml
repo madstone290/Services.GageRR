@@ -59,7 +59,7 @@
 
 <script src="~/lib/app/exceljs.js"></script>
 <script src="~/lib/app/FileSaver.js"></script>
-<script src="~/app/AverageRangeMethod.js"></script>
+<script src="~/app/AnovaMethod.js"></script>
 
 <div class="Page">
     <div class="Toolbar">
@@ -94,7 +94,7 @@
     </form>
     <div class="Form">
         <div style="grid-column: 1/3;">
-            <button onclick="Page.calcuate()">Gage R&R 계산</button>
+            <button onclick="Page.calcuate()">Anova Gage R&R 계산</button>
         </div>
     </div>
 
@@ -125,12 +125,6 @@
                 </div>
             </div>
         }
-
-        <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: 1/3;">
-            <div class="CenterContainer">
-                <span>평균</span>
-            </div>
-        </div>
     </div>
 
     @for (int appraiser = 1; appraiser <= Model.Appraiser; appraiser++)
@@ -163,270 +157,180 @@
                     </div>
                 }
             }
-
-            <div class="GridItem" style="grid-column: 1/3; grid-row:@(Model.Trial + 1);">
-                <div class="CenterContainer">
-                    <span>평균</span>
-                </div>
-            </div>
-
-            @* 평균 *@
-            @for (int part = 1; part <= Model.Part; part++)
-            {
-                <div class="GridItem" style="grid-column:@(part + 2); grid-row: @(Model.Trial + 1);">
-                    <input id="@(GetAppraiserPartAvgId(appraiser, part))" readonly />
-                </div>
-            }
-
-            <div class="GridItem" style="grid-column: 1/3; grid-row:@(Model.Trial + 2);">
-                <div class="CenterContainer">
-                    <span>범위</span>
-                </div>
-            </div>
-
-            @* 범위 *@
-            @for (int part = 1; part <= Model.Part; part++)
-            {
-                <div class="GridItem" style="grid-column:@(part + 2); grid-row: @(Model.Trial + 2);">
-
-                    <input id="@(GetAppraiserPartRangeId(appraiser, part))" value="" readonly />
-                </div>
-            }
-
-            @* 전체 평균 *@
-            @for (int trial = 1; trial <= Model.Trial; trial++)
-            {
-                <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @trial;">
-                    <input id="@(GetAppraiserTrialAvgId(appraiser, trial))" readonly />
-                </div>
-            }
-            <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @(Model.Trial + 1);">
-                <input id="@(GetAppraiserPartAvgAvgId(appraiser))" readonly />
-            </div>
-            <div class="GridItem" style="grid-column:@(Model.Part + 3); grid-row: @(Model.Trial + 2);">
-                <input id="@(GetAppraiserPartRangeAvgId(appraiser))" readonly />
-            </div>
         </div>
     }
 
-
-    @* 파트 평균 *@
-    <div class="PartAvgGrid">
-        <div class="GridItem" style="grid-row: 1; grid-column:1/3;">
-            <div class="CenterContainer">
-                <span>파트평균</span>
-            </div>
-        </div>
-
-        @for (int part = 1; part <= Model.Part; part++)
-        {
-            <div class="GridItem" style="grid-row: 1; grid-column:@(part + 2);">
-                <input id="@(GetPartAvgId(part))" value="" readonly />
-            </div>
-        }
-        <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
-            <input id="resultAvg" readonly />
-        </div>
-    </div>
-
     @* 결과1 *@
     <div class="ResultGrid">
-        <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
-            <div class="CenterContainer">
-                <span>Rp</span>
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 2)">
-            <div class="CenterContainer">
-                <span>R__</span>
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 2);">
-            <div class="CenterContainer">
-                <span>X_Diff</span>
-            </div>
-        </div>
-
-
-        <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 3);">
-            <input id="output-rp" readonly />
-        </div>
-        <div class="GridItem" style="grid-row: 2; grid-column:@(Model.Part + 3);">
-            <input id="output-r__" readonly />
-        </div>
-        <div class="GridItem" style="grid-row: 3; grid-column:@(Model.Part + 3);">
-            <input id="output-x_diff" readonly />
-        </div>
-    </div>
-
-    @* 결과2 *@
-    <div class="ResultGrid2">
-        @* 표준편차 *@
         <div class="GridItem" style="grid-row: 1; grid-column:1;">
             <div class="CenterContainer">
-                <span>EV</span>
+                <span>Source</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 2; grid-column:1;">
+            <div class="CenterContainer">
+                <span>평가자</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:1;">
+            <div class="CenterContainer">
+                <span>파트</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:1;">
+            <div class="CenterContainer">
+                <span>평가자*파트</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 5; grid-column:1;">
+            <div class="CenterContainer">
+                <span>반복성</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 6; grid-column:1;">
+            <div class="CenterContainer">
+                <span>Total</span>
             </div>
         </div>
 
-        <div class="GridItem" style="grid-row: 2; grid-column:1; ">
+        <div class="GridItem" style="grid-row: 1; grid-column:2;">
             <div class="CenterContainer">
-                <span>AV</span>
+                <span>DF(자유도)</span>
             </div>
         </div>
 
-
-        <div class="GridItem" style="grid-row: 3; grid-column:1; ">
-            <div class="CenterContainer">
-                <span>R&R</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 4; grid-column:1; ">
-            <div class="CenterContainer">
-                <span>PV</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row:5; grid-column: 1;">
-            <div class="CenterContainer">
-                <span>TV</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row:6; grid-column: 1;">
-            <div class="CenterContainer">
-                <span>NDC</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-column:2; grid-row: 1;">
-            <div class="CenterContainer">
-                <input id="output-ev_sd" readonly />
-            </div>
-        </div>
-        <div class="GridItem" style="grid-column:2; grid-row: 2;">
-            <div class="CenterContainer">
-                <input id="output-av_sd" readonly />
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 3; grid-column:2; ">
-            <div class="CenterContainer">
-                <input id="grr_sd" readonly />
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 4; grid-column:2; ">
-            <div class="CenterContainer">
-                <input id="output-pv_sd" readonly />
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 5; grid-column:2; ">
-            <div class="CenterContainer">
-                <input id="output-tv_sd" readonly />
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 6; grid-column:2; ">
-            <div class="CenterContainer">
-                <input id="output-ndc" readonly />
-            </div>
-        </div>
-
-
-        @* 공정변동 *@
         <div class="GridItem" style="grid-row: 1; grid-column:3;">
             <div class="CenterContainer">
-                <span>EV_SV(%)</span>
+                <span>DF(제곱합)</span>
             </div>
         </div>
-
-        <div class="GridItem" style="grid-row: 2; grid-column:3; ">
-            <div class="CenterContainer">
-                <span>AV_SV(%)</span>
-            </div>
-        </div>
-
-
-        <div class="GridItem" style="grid-row: 3; grid-column:3; ">
-            <div class="CenterContainer">
-                <span>R&R_SV(%)</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 4; grid-column:3; ">
-            <div class="CenterContainer">
-                <span>PV_SV(%)</span>
-            </div>
-        </div>
-
 
         <div class="GridItem" style="grid-row: 1; grid-column:4;">
             <div class="CenterContainer">
-                <input id="output-ev_sv" readonly />
+                <span>MS(평균제곱)</span>
             </div>
         </div>
-        <div class="GridItem" style="grid-row: 2; grid-column:4;">
-            <div class="CenterContainer">
-                <input id="output-av_sv" readonly />
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 3; grid-column:4; ">
-            <div class="CenterContainer">
-                <input id="output-grr_sv" readonly />
-            </div>
-        </div>
-        <div class="GridItem" style="grid-row: 4; grid-column:4; ">
-            <div class="CenterContainer">
-                <input id="output-pv_sv" readonly />
-            </div>
-        </div>
-
-
-        @* 공차 *@
 
         <div class="GridItem" style="grid-row: 1; grid-column:5;">
             <div class="CenterContainer">
-                <span>EV_T(%)</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 2; grid-column:5; ">
-            <div class="CenterContainer">
-                <span>AV_T(%)</span>
-            </div>
-        </div>
-
-
-        <div class="GridItem" style="grid-row: 3; grid-column:5; ">
-            <div class="CenterContainer">
-                <span>R&R_T(%)</span>
-            </div>
-        </div>
-
-        <div class="GridItem" style="grid-row: 4; grid-column:5; ">
-            <div class="CenterContainer">
-                <span>PV_T(%)</span>
+                <span>F</span>
             </div>
         </div>
 
         <div class="GridItem" style="grid-row: 1; grid-column:6;">
             <div class="CenterContainer">
-                <input id="output-ev_t" readonly />
+                <span>P</span>
             </div>
         </div>
+
+        @* DF *@
+        <div class="GridItem" style="grid-row: 2; grid-column:2">
+            <div class="CenterContainer">
+                <input id="output-df_o" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:2;">
+            <div class="CenterContainer">
+                <input id="output-df_p" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:2;">
+            <div class="CenterContainer">
+                <input id="output-df_op" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 5; grid-column:2;">
+            <div class="CenterContainer">
+                <input id="output-df_r" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 6; grid-column:2;">
+            <div class="CenterContainer">
+                <input id="output-df_total" readonly />
+            </div>
+        </div>
+
+        @* SS *@
+        <div class="GridItem" style="grid-row: 2; grid-column:3">
+            <div class="CenterContainer">
+                <input id="output-ss_o" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:3;">
+            <div class="CenterContainer">
+                <input id="output-ss_p" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:3;">
+            <div class="CenterContainer">
+                <input id="output-ss_op" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 5; grid-column:3;">
+            <div class="CenterContainer">
+                <input id="output-ss_r" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 6; grid-column:3;">
+            <div class="CenterContainer">
+                <input id="output-ss_total" readonly />
+            </div>
+        </div>
+
+
+        @* MS *@
+        <div class="GridItem" style="grid-row: 2; grid-column:4">
+            <div class="CenterContainer">
+                <input id="output-ms_o" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:4;">
+            <div class="CenterContainer">
+                <input id="output-ms_p" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:4;">
+            <div class="CenterContainer">
+                <input id="output-ms_op" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 5; grid-column:4;">
+            <div class="CenterContainer">
+                <input id="output-ms_r" readonly />
+            </div>
+        </div>
+
+        @* F *@
+        <div class="GridItem" style="grid-row: 2; grid-column:5">
+            <div class="CenterContainer">
+                <input id="output-f_o" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:5;">
+            <div class="CenterContainer">
+                <input id="output-f_p" readonly />
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:5;">
+            <div class="CenterContainer">
+                <input id="output-f_op" readonly />
+            </div>
+        </div>
+
+        @* P *@
         <div class="GridItem" style="grid-row: 2; grid-column:6;">
             <div class="CenterContainer">
-                <input id="output-av_t" readonly />
+                <input id="output-p_o" readonly />
             </div>
         </div>
-        <div class="GridItem" style="grid-row: 3; grid-column:6; ">
+        <div class="GridItem" style="grid-row: 3; grid-column:6;">
             <div class="CenterContainer">
-                <input id="output-grr_t" readonly />
+                <input id="output-p_p" readonly />
             </div>
         </div>
-        <div class="GridItem" style="grid-row: 4; grid-column:6; ">
+        <div class="GridItem" style="grid-row: 4; grid-column:6;">
             <div class="CenterContainer">
-                <input id="output-pv_t" readonly />
+                <input id="output-p_op" readonly />
             </div>
         </div>
     </div>

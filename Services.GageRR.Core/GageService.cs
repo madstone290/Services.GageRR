@@ -255,7 +255,7 @@ namespace Services.GageRR.Core
             decimal p_op = 1 - (decimal)alglib.fdistribution(df_op, df_r, (double)f_op);
 
 
-            return new AnovaOutput()
+            var output = new AnovaOutput()
             {
                 DF_Operator = df_o,
                 DF_Part = df_p,
@@ -282,6 +282,9 @@ namespace Services.GageRR.Core
                 P_Part = (double)p_p,
                 P_Operator_Part = (double)p_op
             };
+
+            output.Round();
+            return output;
         }
     }
 

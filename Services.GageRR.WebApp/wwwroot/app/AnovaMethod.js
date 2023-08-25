@@ -34,19 +34,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var AverageRangeMethod = function () {
+var AnovaMethod = function () {
     function downloadExcel() {
         return __awaiter(this, void 0, void 0, function () {
             var response, blob, fileName, saveAs;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch("/files/AverageRangeInput.xlsx")];
+                    case 0: return [4 /*yield*/, fetch("/files/AnovaInput.xlsx")];
                     case 1:
                         response = _a.sent();
                         return [4 /*yield*/, response.blob()];
                     case 2:
                         blob = _a.sent();
-                        fileName = 'AverageRangeInput.xlsx';
+                        fileName = 'AnovaInput.xlsx';
                         saveAs = window.saveAs;
                         saveAs(blob, fileName);
                         return [2 /*return*/];
@@ -156,7 +156,7 @@ var AverageRangeMethod = function () {
     }
     function calcuate() {
         return __awaiter(this, void 0, void 0, function () {
-            var totalAppraiser, totalTrial, totalPart, input, appraiser, trial, part, inputelement, response, json, appraiser, part, avgEdit, rangeEdit, trial, trialEdit, avgAvgEdit, rangeAvgEdit, part, partAvgEdit, partAvgAvgEdit;
+            var totalAppraiser, totalTrial, totalPart, input, appraiser, trial, part, inputelement, response, json;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -167,10 +167,6 @@ var AverageRangeMethod = function () {
                         input.AppraiserCount = totalAppraiser;
                         input.TrialCount = totalTrial;
                         input.PartCount = totalPart;
-                        input.SpecLower = parseFloat(findInputById("sl").value);
-                        input.SpecUpper = parseFloat(findInputById("su").value);
-                        //input.Unit = "MM";
-                        input.Unit = 0; // 0 for MM, 1 for INCH
                         input.Records = [];
                         for (appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
                             for (trial = 1; trial <= totalTrial; trial++) {
@@ -185,7 +181,7 @@ var AverageRangeMethod = function () {
                                 }
                             }
                         }
-                        return [4 /*yield*/, fetch("/api/GageRR/AverageRange", {
+                        return [4 /*yield*/, fetch("/api/GageRR/Anova", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -197,45 +193,26 @@ var AverageRangeMethod = function () {
                         return [4 /*yield*/, response.json()];
                     case 2:
                         json = _a.sent();
-                        findInputById("output-rp").value = json.Rp;
-                        findInputById("output-r__").value = json.R__;
-                        findInputById("output-x_diff").value = json.X_Diff;
-                        findInputById("output-ev_sd").value = json.EV_SD;
-                        findInputById("output-av_sd").value = json.AV_SD;
-                        findInputById("grr_sd").value = json.GRR_SD;
-                        findInputById("output-pv_sd").value = json.PV_SD;
-                        findInputById("output-tv_sd").value = json.TV_SD;
-                        findInputById("output-ndc").value = json.NDC;
-                        findInputById("output-ev_sv").value = json.EV_SV;
-                        findInputById("output-av_sv").value = json.AV_SV;
-                        findInputById("output-grr_sv").value = json.GRR_SV;
-                        findInputById("output-pv_sv").value = json.PV_SV;
-                        findInputById("output-ev_t").value = json.EV_T;
-                        findInputById("output-av_t").value = json.AV_T;
-                        findInputById("output-grr_t").value = json.GRR_T;
-                        findInputById("output-pv_t").value = json.PV_T;
-                        for (appraiser = 1; appraiser <= totalAppraiser; appraiser++) {
-                            for (part = 1; part <= totalPart; part++) {
-                                avgEdit = findInputById(GetAppraiserPartAvgId(appraiser, part));
-                                avgEdit.value = json.AppraiserPartAvg[appraiser][part];
-                                rangeEdit = findInputById(GetAppraiserPartRangeId(appraiser, part));
-                                rangeEdit.value = json.AppraiserPartRange[appraiser][part];
-                            }
-                            for (trial = 1; trial <= totalTrial; trial++) {
-                                trialEdit = findInputById(GetAppraiserTrialAvgId(appraiser, trial));
-                                trialEdit.value = json.AppraiserTrialAvg[appraiser][trial];
-                            }
-                            avgAvgEdit = findInputById(GetAppraiserPartAvgAvgId(appraiser));
-                            avgAvgEdit.value = json.AppraiserAvg[appraiser];
-                            rangeAvgEdit = findInputById(GetAppraiserPartRangeAvgId(appraiser));
-                            rangeAvgEdit.value = json.AppraiserPartRangeAvg[appraiser];
-                        }
-                        for (part = 1; part <= totalPart; part++) {
-                            partAvgEdit = findInputById(GetPartAvgId(part));
-                            partAvgEdit.value = json.PartAvg[part];
-                        }
-                        partAvgAvgEdit = findInputById('resultAvg');
-                        partAvgAvgEdit.value = json.PartAvgAvg;
+                        findInputById("output-df_o").value = json.DF_Operator;
+                        findInputById("output-df_p").value = json.DF_Part;
+                        findInputById("output-df_op").value = json.DF_Operator_Part;
+                        findInputById("output-df_r").value = json.DF_Repeatability;
+                        findInputById("output-df_total").value = json.DF_Total;
+                        findInputById("output-ss_o").value = json.SS_Operator;
+                        findInputById("output-ss_p").value = json.SS_Part;
+                        findInputById("output-ss_op").value = json.SS_Operator_Part;
+                        findInputById("output-ss_r").value = json.SS_Repeatability;
+                        findInputById("output-ss_total").value = json.SS_Total;
+                        findInputById("output-ms_o").value = json.MS_Operator;
+                        findInputById("output-ms_p").value = json.MS_Part;
+                        findInputById("output-ms_op").value = json.MS_Operator_Part;
+                        findInputById("output-ms_r").value = json.MS_Repeatability;
+                        findInputById("output-f_o").value = json.F_Operator;
+                        findInputById("output-f_p").value = json.F_Part;
+                        findInputById("output-f_op").value = json.F_Operator_Part;
+                        findInputById("output-p_o").value = json.P_Operator;
+                        findInputById("output-p_p").value = json.P_Part;
+                        findInputById("output-p_op").value = json.P_Operator_Part;
                         return [2 /*return*/];
                 }
             });
@@ -248,5 +225,5 @@ var AverageRangeMethod = function () {
         calcuate: calcuate
     };
 }();
-window.Page = AverageRangeMethod;
-//# sourceMappingURL=AverageRangeMethod.js.map
+window.Page = AnovaMethod;
+//# sourceMappingURL=AnovaMethod.js.map

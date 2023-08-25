@@ -25,5 +25,13 @@ namespace Services.GageRR.WebApp.Controllers
             var output = _gageService.AverageRangeMethod(input);
             return Ok(output);
         }
+
+        [HttpPost]
+        [Route("Anova")]
+        public IActionResult Anova([FromBody] AverageRangeInput input)
+        {
+            var output = _gageService.AnovaMethod(input);
+            return Ok(output);
+        }
     }
 }

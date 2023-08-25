@@ -138,9 +138,9 @@
     }
 
     async function downloadExcel() {
-        const response = await fetch("/files/GageRange.xlsx");
+        const response = await fetch("/files/RangeInput.xlsx");
         const blob = await response.blob();
-        const fileName = 'GageRange.xlsx';
+        const fileName = 'RangeInput.xlsx';
 
         const saveAs = (window as any).saveAs;
         saveAs(blob, fileName);

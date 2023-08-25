@@ -41,7 +41,7 @@ input[type=number] {
 .CaptionGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr));
     grid-template-rows: repeat(2, var(--cell-height));
     background-color: blanchedalmond;
     align-items: center;
@@ -51,8 +51,8 @@ input[type=number] {
 .InputGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
-    grid-template-rows: repeat(calc(2 + var(--trial-count)), var(--cell-height));
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr));
+    grid-template-rows: repeat(calc(var(--trial-count)), var(--cell-height));
     background-color: antiquewhite;
     align-items: center;
     justify-content: center;
@@ -71,18 +71,8 @@ input[type=number] {
 .ResultGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-columns: repeat(6, minmax(20px, 1fr));
     grid-template-rows: repeat(3, var(--cell-height));
-    background-color: lightblue;
-    align-items: center;
-    justify-content: center;
-}
-
-.ResultGrid2 {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(6,1fr);
-    grid-template-rows: repeat(6, var(--cell-height));
     background-color: lightblue;
     align-items: center;
     justify-content: center;
