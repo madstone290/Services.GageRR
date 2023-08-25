@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.GageRR.Core", "Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.GageRR.WebApp", "Services.GageRR.WebApp\Services.GageRR.WebApp.csproj", "{55FFEDB1-8030-4B3B-B4F7-4015D81A83DA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{457E8624-039C-4440-A9E2-BF92DE2E0000}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\Anova.xlsx = Docs\Anova.xlsx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

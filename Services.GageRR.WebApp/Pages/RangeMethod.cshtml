@@ -37,156 +37,174 @@
     window.basicInfo = {
         appraiserCount: @(Model.Appraiser),
         partCount: @(Model.Part)
-    };
+                                                };
 </script>
 
 <script src="~/lib/app/exceljs.js"></script>
 <script src="~/lib/app/FileSaver.js"></script>
 <script src="~/app/RangeMethod.js"></script>
 
-<div>
-    <button onclick="downloadExcel()">엑셀다운로드</button>
-    <label for="file">엑셀업로드</label>
-    <input name="file" type="file" onchange="uploadExcel(event)" />
-</div>
-
-<div style="padding:4px;">
+<div class="Page">
+    <div class="Toolbar">
+        <button class="Button" onclick="downloadExcel()">엑셀다운로드</button>
+        <label for="file" class="Button">엑셀업로드</label>
+        <input id="file" type="file" style="display:none;" onchange="uploadExcel(event)" />
+    </div>
     <form>
-        <label for="appraiser">측정자</label>
-        <input name="appraiser" value="@Model.Appraiser" />
-        <label for="trial">파트</label>
-        <input name="part" value="@Model.Part" />
-        <button type="submit">적용</button>
-    </form>
-</div>
-
-<div style="padding:4px;">
-    <label for="sl">SL</label>
-    <input id="sl" name="sl" value="24" type="number" />
-    <label for="su">SU</label>
-    <input id="su" name="su" value="24.2" type="number" />
-    <button onclick="calcuate()">calcuate</button>
-</div>
-
-@* 헤더  *@
-
-
-
-
-@* Captions *@
-<div class="CaptionGrid">
-    <div class="GridItem" style="grid-row: 1/3; grid-column:1;">
-        <div class="CenterContainer">
-            <span>측정자</span>
-        </div>
-    </div>
-    <div class="GridItem" style="grid-row: 1; grid-column:2/@(Model.Part + 2);">
-        <div class="CenterContainer">
-            <span>부품(Part)</span>
-        </div>
-    </div>
-    @for (int part = 1; part <= Model.Part; part++)
-    {
-        <div class="GridItem" style="grid-row: 2; grid-column:@(part + 1);">
-            <div class="CenterContainer">
-                <span>@part</span>
+        <div class="Form">
+            <div style="grid-row:1; grid-column: 1; justify-self:end;">
+                <label for="appraiser">측정자</label>
             </div>
+            <div style="grid-row:1; grid-column: 2;">
+                <input name="appraiser" value="@Model.Appraiser" />
+            </div>
+            <div style="grid-column: 3; justify-self:end;">
+                <label for="trial">파트</label>
+            </div>
+            <div style="grid-column: 4;">
+                <input name="part" value="@Model.Part" />
+            </div>
+            <div style="grid-column: 5;">
+                <button type="submit">레이아웃 적용</button>
+            </div>
+        </div>
+    </form>
+    <div class="Form">
+        <div style="grid-row:1; grid-column: 1; justify-self:end;">
+            <label for="sl">규격하한(SL)</label>
+        </div>
+        <div style="grid-row:1; grid-column: 2;">
+
+            <input id="sl" name="sl" value="24" type="number" />
+        </div>
+        <div style="grid-column: 3; justify-self:end;">
+            <label for="su">규격상한(SU)</label>
+        </div>
+        <div style="grid-column: 4;">
+            <input id="su" name="su" value="24.2" type="number" />
+        </div>
+        <div style="grid-column: 5/7;">
+            <button onclick="calcuate()">Gage R&R 계산</button>
+        </div>
+    </div>
+
+    @* Captions *@
+    <div class="CaptionGrid">
+        <div class="GridItem" style="grid-row: 1/3; grid-column:1;">
+            <div class="CenterContainer">
+                <span>측정자</span>
+            </div>
+        </div>
+        <div class="GridItem" style="grid-row: 1; grid-column:2/@(Model.Part + 2);">
+            <div class="CenterContainer">
+                <span>부품(Part)</span>
+            </div>
+        </div>
+        @for (int part = 1; part <= Model.Part; part++)
+        {
+            <div class="GridItem" style="grid-row: 2; grid-column:@(part + 1);">
+                <div class="CenterContainer">
+                    <span>@part</span>
+                </div>
+            </div>
+        }
+
+        <div class="GridItem" style=" grid-row: 1/3; grid-column:@(Model.Part + 2);">
+            <div class="CenterContainer">
+                <span>평균</span>
+            </div>
+        </div>
+    </div>
+
+    @for (int appraiser = 1; appraiser <= Model.Appraiser; appraiser++)
+    {
+        <div class="InputGrid">
+            <div class="GridItem" style="grid-row: 1/3; grid-column:1;">
+                <div class="CenterContainer">
+                    <span>@(appraiser)번</span>
+                </div>
+            </div>
+
+            @for (int part = 1; part <= Model.Part; part++)
+            {
+                <div class="GridItem" style="grid-row: 1; grid-column:@(part + 1);">
+
+                    @* 측정값 입력 *@
+                    <input id="@(GetInputId(appraiser, part))"
+                           appraiser="@appraiser" part="@(part)"
+                           type="number"
+                           onpaste="handlePaste(event)" />
+                </div>
+            }
+            <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
+                @* 측정값 평균 *@
+                <input id="@(GetInputAvgId(appraiser))" readonly />
+            </div>
+
         </div>
     }
 
-    <div class="GridItem" style=" grid-row: 1/3; grid-column:@(Model.Part + 2);">
-        <div class="CenterContainer">
-            <span>평균</span>
-        </div>
-    </div>
-</div>
-
-@for (int appraiser = 1; appraiser <= Model.Appraiser; appraiser++)
-{
-    <div class="InputGrid">
-        <div class="GridItem" style="grid-row: 1/3; grid-column:1;">
+    @* 범위 *@
+    <div class="RangeGrid">
+        <div class="GridItem" style="grid-row: 1; grid-column:1;">
             <div class="CenterContainer">
-                <span>@(appraiser)번</span>
+                <span>범위</span>
             </div>
         </div>
 
         @for (int part = 1; part <= Model.Part; part++)
         {
-            <div class="GridItem" style="grid-row: 1; grid-column:@(part + 1);">
+            <div class="GridItem" style=" grid-row: 1; grid-column:@(part + 1);">
 
-                @* 측정값 입력 *@
-                <input id="@(GetInputId(appraiser, part))"
-                       appraiser="@appraiser" part="@(part)"
-                       type="number"
-                       onpaste="handlePaste(event)" />
+                <input id="@(GetRangeId(part))" readonly />
             </div>
         }
+
         <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
-            @* 측정값 평균 *@
-            <input id="@(GetInputAvgId(appraiser))" readonly />
-        </div>
-
-    </div>
-}
-
-@* 범위 *@
-<div class="RangeGrid">
-    <div class="GridItem" style="grid-row: 1; grid-column:1;">
-        <div class="CenterContainer">
-            <span>범위</span>
-        </div>
-    </div>
-
-    @for (int part = 1; part <= Model.Part; part++)
-    {
-        <div class="GridItem" style=" grid-row: 1; grid-column:@(part + 1);">
-
-            <input id="@(GetRangeId(part))" readonly />
-        </div>
-    }
-
-    <div class="GridItem" style="grid-row: 1; grid-column:@(Model.Part + 2);">
-        @* 범위 평균 *@
-        <input id="@(GetRangeAvgId())" readonly />
-    </div>
-</div>
-
-
-
-@* 결과1 *@
-<div class="OutputGrid">
-    <div caption class="GridItem" style="grid-row: 1; grid-column:1;">
-        <div class="CenterContainer">
-            <span>R_</span>
-        </div>
-    </div>
-    <div caption class="GridItem" style="grid-row: 2; grid-column:1;">
-        <div class="CenterContainer">
-            <span>Tolerance</span>
-        </div>
-    </div>
-    <div caption class="GridItem" style="grid-row: 3; grid-column:1;">
-        <div class="CenterContainer">
-            <span>GRR</span>
-        </div>
-    </div>
-    <div caption class="GridItem" style="grid-row: 4; grid-column:1;">
-        <div class="CenterContainer">
-            <span>GRR(%)</span>
+            @* 범위 평균 *@
+            <input id="@(GetRangeAvgId())" readonly />
         </div>
     </div>
 
 
-    <div class="GridItem" style="grid-row: 1; grid-column:2;">
-        <input id="output-r_" readonly />
+
+    @* 결과1 *@
+    <div class="OutputGrid">
+        <div caption class="GridItem" style="grid-row: 1; grid-column:1;">
+            <div class="CenterContainer">
+                <span>R_</span>
+            </div>
+        </div>
+        <div caption class="GridItem" style="grid-row: 2; grid-column:1;">
+            <div class="CenterContainer">
+                <span>Tolerance</span>
+            </div>
+        </div>
+        <div caption class="GridItem" style="grid-row: 3; grid-column:1;">
+            <div class="CenterContainer">
+                <span>GRR</span>
+            </div>
+        </div>
+        <div caption class="GridItem" style="grid-row: 4; grid-column:1;">
+            <div class="CenterContainer">
+                <span>GRR(%)</span>
+            </div>
+        </div>
+
+
+        <div class="GridItem" style="grid-row: 1; grid-column:2;">
+            <input id="output-r_" readonly />
+        </div>
+        <div class="GridItem" style="grid-row: 2; grid-column:2;">
+            <input id="output-t" readonly />
+        </div>
+        <div class="GridItem" style="grid-row: 3; grid-column:2;">
+            <input id="output-grr" readonly />
+        </div>
+        <div class="GridItem" style="grid-row: 4; grid-column:2;">
+            <input id="output-grr_t" readonly />
+        </div>
     </div>
-    <div class="GridItem" style="grid-row: 2; grid-column:2;">
-        <input id="output-t" readonly />
-    </div>
-    <div class="GridItem" style="grid-row: 3; grid-column:2;">
-        <input id="output-grr" readonly />
-    </div>
-    <div class="GridItem" style="grid-row: 4; grid-column:2;">
-        <input id="output-grr_t" readonly />
-    </div>
+
+
 </div>

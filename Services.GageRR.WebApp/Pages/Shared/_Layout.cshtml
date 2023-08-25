@@ -3,15 +3,37 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Services.GageRR.WebApp</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Services.GageRR.WebApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="container">
-        <main role="main" style="padding:10px;" >
-            @RenderBody()
+    <div class="Container">
+        <nav class="Navbar">
+            <div class="NavItem">
+                <span class="NavTitle">분석 방법</span>
+            </div>
+            <div class="NavItem">
+                <a href="/RangeMethod">범위 방법</a>
+            </div>
+            <div class="NavItem">
+                <a href="/AverageRangeMethod">평균 및 범위 방법</a>
+            </div>
+            <div class="NavItem">
+                <a href="/AnovaMethod">분산분석(Anova)</a>
+            </div>
+        </nav>
+        <main role="main" style="padding:10px;">
+            <div class="Header">
+                <span class="HeaderTitle"> Gage R&R 계산기</span>
+            </div>
+            <div class="Content">
+                @RenderBody()
+            </div>
+            <div class="Footer">
+
+            </div>
         </main>
     </div>
 

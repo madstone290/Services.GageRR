@@ -10,35 +10,10 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
-.Toolbar{
-    padding: 10px 20px 10px 20px;
-}
-
-.Form {
-    padding: 10px 20px 10px 20px;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    grid-column-gap: 10px;
-}
-
-.Button {
-    display:inline-block;
-    background-color: #eee;
-    border: solid 1px #111;
-    padding: 2px 4px 2px 4px; 
-    cursor: pointer;
-}
-
-
-
-
 .CaptionGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
     grid-template-rows: repeat(2, var(--cell-height));
     background-color: blanchedalmond;
     align-items: center;
@@ -48,35 +23,42 @@ input[type=number] {
 .InputGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-rows: repeat(calc(2 + var(--trial-count)), var(--cell-height));
+    background-color: antiquewhite;
+    align-items: center;
+    justify-content: center;
+}
+
+.PartAvgGrid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
     grid-template-rows: repeat(1, var(--cell-height));
     background-color: antiquewhite;
     align-items: center;
     justify-content: center;
 }
 
-.RangeGrid {
+.ResultGrid {
     display: grid;
     width: 100%;
-    grid-template-columns: 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
-    grid-template-rows: repeat(1, var(--cell-height));
-    background-color: antiquewhite;
-    align-items: center;
-    justify-content: center;
-}
-
-.OutputGrid {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
+    grid-template-columns: 100px 100px repeat(var(--part-count), minmax(20px, 1fr)) 100px;
     grid-template-rows: repeat(3, var(--cell-height));
+    background-color: lightblue;
     align-items: center;
     justify-content: center;
 }
 
-    .OutputGrid .GridItem[caption] {
-        background-color: lightblue;
-    }
+.ResultGrid2 {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(6,1fr);
+    grid-template-rows: repeat(6, var(--cell-height));
+    background-color: lightblue;
+    align-items: center;
+    justify-content: center;
+}
 
 .GridItem {
     width: 100%;
