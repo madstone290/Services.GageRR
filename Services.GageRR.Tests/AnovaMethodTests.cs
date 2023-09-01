@@ -1,4 +1,5 @@
-﻿using Services.GageRR.Core;
+﻿using FluentAssertions;
+using Services.GageRR.Core;
 using Services.GageRR.Core.Data;
 
 namespace Services.GageRR.Tests
@@ -30,12 +31,12 @@ new List<double>(){ 2.15, 2.32, 2.33, 4.22, 3.75, 2.12, 2.22, 5.54, 1.72, 3.69 }
                 }
             };
 
-            var input = new AverageRangeInput()
+            var input = new AnovaInput()
             {
                 AppraiserCount = 3,
                 TrialCount = 3,
                 PartCount = 10,
-                Records = InputRecordFactory.Build(testData)
+                Records = InputRecordFactory.BuildAnovaRecord(testData)
             };
 
             AnovaOutput output = new GageService().AnovaMethod(input);
@@ -58,13 +59,13 @@ new List<double>(){ 2.15, 2.32, 2.33, 4.22, 3.75, 2.12, 2.22, 5.54, 1.72, 3.69 }
             Assert.Equal(0.0248, output.MS_Operator_Part, 4);
             Assert.Equal(0.0601, output.MS_Repeatability, 4);
 
-            Assert.Equal(2.0128, output.F_Operator, 4);
-            Assert.Equal(521.6101, output.F_Part, 4);
-            Assert.Equal(0.4130, output.F_Operator_Part, 4);
+            output.F_Operator.Should().BeApproximately(2.0128, 0.0001);
+            output.F_Part.Should().BeApproximately(521.6101, 0.0001);
+            output.F_Operator_Part.Should().BeApproximately(0.4130, 0.0001);
 
-            Assert.Equal(0.1626, output.P_Operator, 4);
-            Assert.Equal(0.0000, output.P_Part, 4);
-            Assert.Equal(0.9799, output.P_Operator_Part, 4);
+            output.P_Operator.Should().BeApproximately(0.1626, 0.0001);
+            output.P_Part.Should().BeApproximately(0.0000, 0.0001);
+            output.P_Operator_Part.Should().BeApproximately(0.9799, 0.0001);
 
         }
     }

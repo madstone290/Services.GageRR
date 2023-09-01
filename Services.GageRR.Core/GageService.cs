@@ -33,6 +33,8 @@ namespace Services.GageRR.Core
         /// <returns></returns>
         public RangeOutput RangeMethod(RangeInput input)
         {
+            _inputValidator.Validate(input);
+
             var appraiserAvg = input.Records.GroupBy(x => x.Appraiser)
                 .ToDictionary(
                     appraiserGroup => appraiserGroup.Key,
@@ -66,19 +68,6 @@ namespace Services.GageRR.Core
         /// <returns></returns>
         public AverageRangeOutput AverageRangeMethod(AverageRangeInput input)
         {
-            /**
-            * n: part count
-            * r: trial count
-            * x_diff: 평가자평균max - 평가자평균min
-            * EV = R__ * K1
-            * AV = Sqrt((X_diff * K2)^2 - EV^2/nr)
-            * GRR = Sqrt(EV^2 + AV^2)
-            * PV = Rp * K3
-            * TV = Sqrt( GRR^2 + PV^2 )
-            * */
-
-
-
             _inputValidator.Validate(input);
 
             var records = input.Records;
@@ -193,8 +182,10 @@ namespace Services.GageRR.Core
             return output;
         }
 
-        public AnovaOutput AnovaMethod(AverageRangeInput input)
+        public AnovaOutput AnovaMethod(AnovaInput input)
         {
+            _inputValidator.Validate(input);
+
             var records = input.Records;
 
             decimal x__ = records.Average(x => x.Value);
@@ -246,13 +237,13 @@ namespace Services.GageRR.Core
             decimal ms_op = ss_op / df_op;
             decimal ms_r = ss_r / df_r;
 
-            decimal f_o = ms_o / ms_op;
-            decimal f_p = ms_p / ms_op;
-            decimal f_op = ms_op / ms_r;
+            decimal? f_o = ms_op == 0 ? null : ms_o / ms_op;
+            decimal? f_p = ms_op == 0 ? null : ms_p / ms_op;
+            decimal? f_op = ms_r == 0 ? null : ms_op / ms_r;
 
-            decimal p_o = 1 - (decimal)alglib.fdistribution(df_o, df_op, (double)f_o);
-            decimal p_p = 1 - (decimal)alglib.fdistribution(df_p, df_op, (double)f_p);
-            decimal p_op = 1 - (decimal)alglib.fdistribution(df_op, df_r, (double)f_op);
+            decimal? p_o = f_o == null ? null : 1 - (decimal)alglib.fdistribution(df_o, df_op, (double)f_o);
+            decimal? p_p = f_p == null ? null : 1 - (decimal)alglib.fdistribution(df_p, df_op, (double)f_p);
+            decimal? p_op = f_op == null ? null : 1 - (decimal)alglib.fdistribution(df_op, df_r, (double)f_op);
 
 
             var output = new AnovaOutput()
@@ -274,13 +265,13 @@ namespace Services.GageRR.Core
                 MS_Operator_Part = (double)ms_op,
                 MS_Repeatability = (double)ms_r,
 
-                F_Operator = (double)f_o,
-                F_Part = (double)f_p,
-                F_Operator_Part = (double)f_op,
+                F_Operator = f_o.HasValue ? (double)f_o : null,
+                F_Part = f_p.HasValue ? (double)f_p : null,
+                F_Operator_Part = f_op.HasValue ? (double)f_op : null,
 
-                P_Operator = (double)p_o,
-                P_Part = (double)p_p,
-                P_Operator_Part = (double)p_op
+                P_Operator = p_o.HasValue ? (double)p_o : null,
+                P_Part = p_p.HasValue ? (double)p_p : null,
+                P_Operator_Part = p_op.HasValue ? (double)p_op : null
             };
 
             output.Round();

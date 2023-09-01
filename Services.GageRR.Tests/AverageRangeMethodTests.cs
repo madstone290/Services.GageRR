@@ -43,7 +43,7 @@ namespace Services.GageRR.Tests
                 SpecUpper = 24.2M,
                 SpecLower = 24.0M,
                 Unit = Unit.MM,
-                Records = InputRecordFactory.Build(testData)
+                Records = InputRecordFactory.BuildAverageRangeRecord(testData)
             };
 
             AverageRangeOutput output = new GageService().AverageRangeMethod(input);
@@ -105,7 +105,7 @@ namespace Services.GageRR.Tests
                 SpecUpper = 5,
                 SpecLower = 2,
                 Unit = Unit.Inch,
-                Records = InputRecordFactory.Build(testData)
+                Records = InputRecordFactory.BuildAverageRangeRecord(testData)
             };
 
             AverageRangeOutput output = new GageService().AverageRangeMethod(input);

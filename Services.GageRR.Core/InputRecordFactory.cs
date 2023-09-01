@@ -12,7 +12,7 @@ namespace Services.GageRR.Core
         /// </summary>
         /// <param name="listData"></param>
         /// <returns></returns>
-        public static List<AverageRangeInput.Record> Build(List<List<List<double>>> listData)
+        public static List<AverageRangeInput.Record> BuildAverageRangeRecord(List<List<List<double>>> listData)
         {
             return listData.SelectMany((trials, appraiserIdx) =>
             {
@@ -21,6 +21,27 @@ namespace Services.GageRR.Core
                     return parts.Select((value, partIdx) =>
                     {
                         return new AverageRangeInput.Record()
+                        {
+                            Appraiser = appraiserIdx + 1,
+                            Trial = trialIdx + 1,
+                            Part = partIdx + 1,
+                            Value = (decimal)value
+                        };
+                    });
+                });
+            })
+            .ToList();
+        }
+
+        public static List<AnovaInput.Record> BuildAnovaRecord(List<List<List<double>>> listData)
+        {
+            return listData.SelectMany((trials, appraiserIdx) =>
+            {
+                return trials.SelectMany((parts, trialIdx) =>
+                {
+                    return parts.Select((value, partIdx) =>
+                    {
+                        return new AnovaInput.Record()
                         {
                             Appraiser = appraiserIdx + 1,
                             Trial = trialIdx + 1,
